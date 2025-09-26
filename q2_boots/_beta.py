@@ -6,12 +6,12 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import math
 import functools
 import warnings
 
 import numpy as np
 import skbio
-from hdmedians import medoid
 import kmedoids
 
 from q2_diversity_lib.beta import METRICS
@@ -114,11 +114,33 @@ def _per_cell_average(a, average_method):
 
 
 def _medoid(a):
-    # i dont think I need to condense for kmedoids
     condensed_dms = np.asarray([dm.condensed_form() for dm in a])
-    medoid_dm_index = kmedoids.fasterpam(condensed_dms, medoids=1)
-    print(medoid_dm_index)
+    dm = np.asarray(_calc_euclidean_distances(condensed_dms))
+    medoid_dm_index = kmedoids.fasterpam(dm, medoids=1)
     return a[medoid_dm_index.medoids[0]]
+
+
+def _calc_euclidean_distances(a):
+    lower_left_dm = []
+
+    for i in range(len(a)):
+        distances = []
+        for j in range(i):
+            distance = math.dist(a[i], a[j])
+            distances.append(distance)
+        distances.append(0.0)
+        lower_left_dm.append(distances)
+
+    # Probably quicker for large dms to only calc half then mirror
+    full_dm = []
+    for i in range(len(a) - 1):
+        full_row = lower_left_dm[i]
+        for j in range(i + 1, len(a)):
+            full_row.append(lower_left_dm[j][i])
+        full_dm.append(full_row)
+    full_dm.append(lower_left_dm[-1])
+
+    return full_dm
 
 
 def _validate_beta_metric(metric, phylogeny):
