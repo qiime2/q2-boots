@@ -121,26 +121,16 @@ def _medoid(a):
 
 
 def _calc_euclidean_distances(a):
-    lower_left_dm = []
+    dm = np.empty((len(a), len(a)))
 
     for i in range(len(a)):
-        distances = []
         for j in range(i):
             distance = math.dist(a[i], a[j])
-            distances.append(distance)
-        distances.append(0.0)
-        lower_left_dm.append(distances)
+            dm[i][j] = distance
+            dm[j][i] = distance
+        dm[i][i] = 0
 
-    # Probably quicker for large dms to only calc half then mirror
-    full_dm = []
-    for i in range(len(a) - 1):
-        full_row = lower_left_dm[i]
-        for j in range(i + 1, len(a)):
-            full_row.append(lower_left_dm[j][i])
-        full_dm.append(full_row)
-    full_dm.append(lower_left_dm[-1])
-
-    return full_dm
+    return dm
 
 
 def _validate_beta_metric(metric, phylogeny):
