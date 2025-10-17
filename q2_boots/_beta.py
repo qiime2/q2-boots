@@ -12,7 +12,6 @@ import warnings
 
 import numpy as np
 import skbio
-import kmedoids
 
 from q2_diversity_lib.beta import METRICS
 
