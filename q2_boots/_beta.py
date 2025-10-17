@@ -115,22 +115,20 @@ def _per_cell_average(a, average_method):
 
 def _medoid(a):
     condensed_dms = np.asarray([dm.condensed_form() for dm in a])
-    dm = np.asarray(_calc_euclidean_distances(condensed_dms))
-    medoid_dm_index = kmedoids.fasterpam(dm, medoids=1)
-    return a[medoid_dm_index.medoids[0]]
+    medoid_dm_index = _calc_medoid(condensed_dms)
+    return a[medoid_dm_index]
 
 
-def _calc_euclidean_distances(a):
-    dm = np.empty((len(a), len(a)))
+def _calc_medoid(a):
+    sums = np.zeros(len(a))
 
     for i in range(len(a)):
         for j in range(i):
             distance = math.dist(a[i], a[j])
-            dm[i][j] = distance
-            dm[j][i] = distance
-        dm[i][i] = 0
+            sums[i] += distance
+            sums[j] += distance
 
-    return dm
+    return np.argmin(sums)
 
 
 def _validate_beta_metric(metric, phylogeny):
