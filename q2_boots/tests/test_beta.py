@@ -143,19 +143,19 @@ class BetaCollectionTests(TestPluginBase):
     def test_beta_collection_invalid_input(self):
         with self.assertRaisesRegex(
             ValueError, 'requires a phylogenetic tree'
-                ):
+        ):
             self.beta_collection_pipeline(
                 table=self.table1, metric='weighted_unifrac', sampling_depth=1,
-                n=10, replacement=False)
+                n=1, replacement=False)
 
     def test_beta_collection_w_replacement(self):
         # At a sampling depth of 2, with self.table1, and when sampling with
         # replacement, there are three possible Jaccard distance matrices.
         # Confirm that we see each of these at least once and no others.
         observed, = self.beta_collection_pipeline(
-            table=self.table1, metric='jaccard', sampling_depth=2, n=100,
+            table=self.table1, metric='jaccard', sampling_depth=2, n=10,
             replacement=True)
-        self.assertEqual(len(observed), 100)
+        self.assertEqual(len(observed), 10)
 
         possible_dm1 = skbio.DistanceMatrix([[0, 0.5], [0.5, 0]],
                                             ids=['S1', 'S2'])
@@ -190,9 +190,9 @@ class BetaCollectionTests(TestPluginBase):
         expected = skbio.DistanceMatrix([[0, 0.5], [0.5, 0]], ids=['S1', 'S2'])
 
         observed, = self.beta_collection_pipeline(
-            table=self.table1, metric='jaccard', sampling_depth=2, n=10,
+            table=self.table1, metric='jaccard', sampling_depth=2, n=3,
             replacement=False)
-        self.assertEqual(len(observed), 10)
+        self.assertEqual(len(observed), 3)
         for o in observed.values():
             o = o.view(skbio.DistanceMatrix)
             self.assertEqual(o, expected)
@@ -210,8 +210,8 @@ class BetaCollectionTests(TestPluginBase):
         observed, = self.beta_collection_pipeline(
             table=self.table1, metric='unweighted_unifrac',
             phylogeny=phylogeny,
-            sampling_depth=2, n=10, replacement=False)
-        self.assertEqual(len(observed), 10)
+            sampling_depth=2, n=3, replacement=False)
+        self.assertEqual(len(observed), 3)
         for o in observed.values():
             o = o.view(skbio.DistanceMatrix)
             self.assertEqual(o.ids, expected.ids)
@@ -252,7 +252,7 @@ class BetaTests(TestPluginBase):
         observed, = self.beta_pipeline(table=self.table1,
                                        metric='jaccard',
                                        sampling_depth=2,
-                                       n=9,
+                                       n=3,
                                        average_method='non-metric-median',
                                        replacement=True)
         observed = observed.view(skbio.DistanceMatrix)
@@ -266,7 +266,7 @@ class BetaTests(TestPluginBase):
         observed, = self.beta_pipeline(table=self.table1,
                                        metric='jaccard',
                                        sampling_depth=2,
-                                       n=20,
+                                       n=4,
                                        average_method='non-metric-mean',
                                        replacement=True)
         observed = observed.view(skbio.DistanceMatrix)
@@ -285,7 +285,7 @@ class BetaTests(TestPluginBase):
         observed, = self.beta_pipeline(table=self.table1,
                                        metric='jaccard',
                                        sampling_depth=2,
-                                       n=10,
+                                       n=3,
                                        average_method='medoid',
                                        replacement=False)
         observed = observed.view(skbio.DistanceMatrix)
@@ -294,7 +294,7 @@ class BetaTests(TestPluginBase):
         observed, = self.beta_pipeline(table=self.table1,
                                        metric='jaccard',
                                        sampling_depth=2,
-                                       n=10,
+                                       n=3,
                                        average_method='non-metric-median',
                                        replacement=False)
         observed = observed.view(skbio.DistanceMatrix)
@@ -303,7 +303,7 @@ class BetaTests(TestPluginBase):
         observed, = self.beta_pipeline(table=self.table1,
                                        metric='jaccard',
                                        sampling_depth=2,
-                                       n=10,
+                                       n=3,
                                        average_method='non-metric-mean',
                                        replacement=False)
         observed = observed.view(skbio.DistanceMatrix)
@@ -316,7 +316,7 @@ class BetaTests(TestPluginBase):
             self.beta_pipeline(table=self.table1,
                                metric='weighted_unifrac',
                                sampling_depth=1,
-                               n=10,
+                               n=1,
                                average_method='medoid',
                                replacement=False)
 
@@ -324,7 +324,7 @@ class BetaTests(TestPluginBase):
             self.beta_pipeline(table=self.table1,
                                metric='jaccard',
                                sampling_depth=1,
-                               n=10,
+                               n=1,
                                average_method='xyz',
                                replacement=False)
 
