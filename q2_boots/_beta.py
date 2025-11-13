@@ -113,9 +113,6 @@ def _per_cell_average(a, average_method):
 
 
 def _medoid(a):
-    if len(a) == 1:
-        return a[0]
-
     if len(a) == 0:
         raise ValueError("No distance matrices provided.")
 
