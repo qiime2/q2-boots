@@ -113,6 +113,18 @@ def _per_cell_average(a, average_method):
 
 
 def _medoid(a):
+    if len(a) == 1:
+        return a[0]
+
+    if len(a) == 0:
+        raise ValueError("No distance matrices provided.")
+
+    for i in range(len(a) - 1):
+        if a[i].size != a[i + 1].size:
+            raise ValueError("Not all distance matrices are the same size.")
+        if a[i].ids != a[i + 1].ids:
+            raise ValueError("Not all distance matrices share the same ids.")
+
     condensed_dms = np.asarray([dm.condensed_form() for dm in a])
     sums = np.zeros(len(condensed_dms))
 
