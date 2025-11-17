@@ -4,7 +4,4 @@ channels:
 - bioconda
 dependencies:
   - qiime2-amplicon
-  - hdmedians
-  - pip
-  - pip:
-     - q2-kmerizer@git+https://github.com/bokulich-lab/q2-kmerizer.git@main
+  - q2-kmerizer
