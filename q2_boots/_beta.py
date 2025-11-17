@@ -69,7 +69,7 @@ def beta_collection(
 
 
 def beta(ctx, table, metric, sampling_depth, n, replacement,
-         average_method='non-metric-median', phylogeny=None,
+         average_method='medoid', phylogeny=None,
          bypass_tips=_METRIC_MOD_DEFAULTS['bypass_tips'],
          pseudocount=_METRIC_MOD_DEFAULTS['pseudocount'],
          alpha=_METRIC_MOD_DEFAULTS['alpha'],
