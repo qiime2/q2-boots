@@ -23,10 +23,17 @@ def table_factory():
 
 
 def sequences_factory():
-    sequences = pd.Series(data=[skbio.DNA('GGACCCCTACGCCCATGGTAAACCGACTGGTCGTACGTGA'),  # noqa: E501
-                                skbio.DNA('ACACGGACCTAAGAGCCGACCGCGTACAAAGGCGGGTACGTGCATTGGTTCCGGATCGCCCCGTACATCCGAAGAGCGTC'),  # noqa: E501
-                                skbio.DNA('ACCCCGCCGGGTCATCATCATGCCAGCGACTACCA')],  # noqa: E501
-                          index=['F1', 'F2', 'F3'])
+    sequences = pd.Series(
+        data=[
+            skbio.DNA('GGACCCCTACGCCCATGGTAAACCGACTGGTCGTACGTGA'),
+            skbio.DNA(
+                'ACACGGACCTAAGAGCCGACCGCGTACAAAGGCGGGTACGTGCATTGGTTCCGGATCGCCC'
+                'CGTACATCCGAAGAGCGTC'
+            ),
+            skbio.DNA('ACCCCGCCGGGTCATCATCATGCCAGCGACTACCA')
+        ],
+        index=['F1', 'F2', 'F3']
+    )
     return qiime2.Artifact.import_data(
         "FeatureData[Sequence]", sequences, view_type=pd.Series)
 
@@ -48,7 +55,7 @@ def _resample_bootstrap_example(use):
                         action_id='resample'),
         use.UsageInputs(table=table,
                         sampling_depth=20,
-                        n=10,
+                        n=2,
                         replacement=True),
         use.UsageOutputNames(resampled_tables='bootstrapped_tables')
     )
@@ -62,7 +69,7 @@ def _resample_rarefaction_example(use):
                         action_id='resample'),
         use.UsageInputs(table=table,
                         sampling_depth=20,
-                        n=10,
+                        n=2,
                         replacement=False),
         use.UsageOutputNames(resampled_tables='rarefaction_tables')
     )
@@ -77,7 +84,7 @@ def _alpha_bootstrap_example(use):
         use.UsageInputs(table=table,
                         sampling_depth=20,
                         metric='observed_features',
-                        n=10,
+                        n=2,
                         replacement=True,
                         average_method='median'),
         use.UsageOutputNames(
@@ -94,7 +101,7 @@ def _alpha_rarefaction_example(use):
         use.UsageInputs(table=table,
                         sampling_depth=20,
                         metric='observed_features',
-                        n=10,
+                        n=2,
                         replacement=False,
                         average_method='median'),
         use.UsageOutputNames(
@@ -111,7 +118,7 @@ def _beta_bootstrap_example(use):
         use.UsageInputs(table=table,
                         metric='braycurtis',
                         sampling_depth=20,
-                        n=10,
+                        n=2,
                         replacement=True,
                         average_method='medoid'),
         use.UsageOutputNames(
@@ -128,7 +135,7 @@ def _beta_rarefaction_example(use):
         use.UsageInputs(table=table,
                         sampling_depth=20,
                         metric='braycurtis',
-                        n=10,
+                        n=2,
                         replacement=False,
                         average_method='medoid'),
         use.UsageOutputNames(
@@ -158,7 +165,7 @@ def _core_metrics_bootstrap_example(use):
         use.UsageInputs(table=table,
                         metadata=metadata,
                         sampling_depth=20,
-                        n=10,
+                        n=2,
                         replacement=True,
                         alpha_average_method='median',
                         beta_average_method='medoid'),
@@ -183,7 +190,7 @@ def _core_metrics_rarefaction_example(use):
         use.UsageInputs(table=table,
                         metadata=metadata,
                         sampling_depth=20,
-                        n=10,
+                        n=2,
                         replacement=False,
                         alpha_average_method='median',
                         beta_average_method='medoid'),
@@ -209,7 +216,7 @@ def _kmer_diversity_bootstrap_example(use):
                         sequences=sequences,
                         metadata=metadata,
                         sampling_depth=20,
-                        n=10,
+                        n=2,
                         kmer_size=5,
                         replacement=True,
                         alpha_average_method='median',

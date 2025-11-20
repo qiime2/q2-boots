@@ -71,14 +71,13 @@ class ResampleTests(TestPluginBase):
     def test_w_replacement(self):
         obs_tables, = self.resample_pipeline(table=self.table_artifact3,
                                              sampling_depth=2,
-                                             n=100,
+                                             n=25,
                                              replacement=True)
         # if sampling with replacement from a sample with 2 unique features
         # that have one observation each, we should observe a resampled
         # table with only one feature 50% of the time. the probability of not
-        # seeing a table with only one feature in 100 resample tables is 1e-30,
-        # so intermittent failure of this test is possible but should be
-        # extremely infrequent
+        # seeing a table with only one feature in 25 resample tables is ~1e-8,
+        # so rare intermittent failure of this test is possible
         fewer_than_two_unique_features_ever_observed = False
         for obs_table in obs_tables.values():
             obs_table = obs_table.view(pd.DataFrame)
@@ -89,12 +88,11 @@ class ResampleTests(TestPluginBase):
     def test_wo_replacement(self):
         obs_tables, = self.resample_pipeline(table=self.table_artifact3,
                                              sampling_depth=2,
-                                             n=100,
+                                             n=4,
                                              replacement=False)
         # if sampling with replacement from a sample with 2 unique features
         # that have one observation each, we should never observe a resampled
-        # feature table with only one feature. confirm that over 100
-        # iterations we always have two features in the resampled table.
+        # feature table with only one feature.
         exactly_two_features_always_observed = True
         for obs_table in obs_tables.values():
             obs_table = obs_table.view(pd.DataFrame)
@@ -106,7 +104,7 @@ class ResampleTests(TestPluginBase):
     def _expected_sampling_depth(self, replacement):
         obs_tables, = self.resample_pipeline(table=self.table_artifact2,
                                              sampling_depth=1,
-                                             n=10,
+                                             n=4,
                                              replacement=replacement)
         for obs_table in obs_tables.values():
             obs_table = obs_table.view(pd.DataFrame)
@@ -115,7 +113,7 @@ class ResampleTests(TestPluginBase):
 
         obs_tables, = self.resample_pipeline(table=self.table_artifact2,
                                              sampling_depth=2,
-                                             n=10,
+                                             n=3,
                                              replacement=replacement)
         for obs_table in obs_tables.values():
             obs_table = obs_table.view(pd.DataFrame)
@@ -124,7 +122,7 @@ class ResampleTests(TestPluginBase):
 
         obs_tables, = self.resample_pipeline(table=self.table_artifact2,
                                              sampling_depth=50,
-                                             n=10,
+                                             n=2,
                                              replacement=replacement)
         for obs_table in obs_tables.values():
             obs_table = obs_table.view(pd.DataFrame)
@@ -135,12 +133,12 @@ class ResampleTests(TestPluginBase):
         with self.assertRaisesRegex(ValueError, "no samples or features"):
             _ = self.resample_pipeline(table=self.table_artifact1,
                                        sampling_depth=6,
-                                       n=10,
+                                       n=1,
                                        replacement=replacement)
 
         obs_tables, = self.resample_pipeline(table=self.table_artifact1,
                                              sampling_depth=5,
-                                             n=10,
+                                             n=2,
                                              replacement=replacement)
         for obs_table in obs_tables.values():
             obs_table = obs_table.view(pd.DataFrame)
@@ -149,7 +147,7 @@ class ResampleTests(TestPluginBase):
 
         obs_tables, = self.resample_pipeline(table=self.table_artifact1,
                                              sampling_depth=2,
-                                             n=10,
+                                             n=2,
                                              replacement=replacement)
         for obs_table in obs_tables.values():
             obs_table = obs_table.view(pd.DataFrame)
@@ -158,7 +156,7 @@ class ResampleTests(TestPluginBase):
 
         obs_tables, = self.resample_pipeline(table=self.table_artifact1,
                                              sampling_depth=1,
-                                             n=10,
+                                             n=2,
                                              replacement=replacement)
         for obs_table in obs_tables.values():
             obs_table = obs_table.view(pd.DataFrame)

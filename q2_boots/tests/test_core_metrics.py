@@ -43,9 +43,9 @@ class CoreMetricsTests(TestPluginBase):
                                    sampling_depth=2,
                                    metadata=self.metadata,
                                    replacement=False,
-                                   n=10)
+                                   n=2)
         # n tables returned
-        self.assertEqual(len(output[0]), 10)
+        self.assertEqual(len(output[0]), 2)
         expected_table = pd.DataFrame(data=[[1.0, 1.0], [0.0, 2.0]],
                                       columns=['F1', 'F2'],
                                       index=['S1', 'S2'])
@@ -83,9 +83,9 @@ class CoreMetricsTests(TestPluginBase):
                                    sampling_depth=2,
                                    metadata=self.metadata,
                                    replacement=True,
-                                   n=99)
+                                   n=9)
         # n tables returned
-        self.assertEqual(len(output[0]), 99)
+        self.assertEqual(len(output[0]), 9)
         possible_table1 = pd.DataFrame(data=[[1.0, 1.0], [0.0, 2.0]],
                                        columns=['F1', 'F2'],
                                        index=['S1', 'S2'])

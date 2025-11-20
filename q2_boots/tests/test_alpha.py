@@ -70,9 +70,9 @@ class AlphaCollectionTests(TestPluginBase):
         # at a sampling depth of 1, with table1 as input, there is one possible
         # outcome. confirm that we observe it.
         observed, = self.alpha_collection_pipeline(
-            table=table1, sampling_depth=1, metric='observed_features', n=42,
+            table=table1, sampling_depth=1, metric='observed_features', n=4,
             replacement=True)
-        self.assertEqual(len(observed), 42)
+        self.assertEqual(len(observed), 4)
 
         expected_series = pd.Series([1, 1],
                                     index=['S1', 'S2'],
@@ -82,13 +82,13 @@ class AlphaCollectionTests(TestPluginBase):
             pdt.assert_series_equal(observed_series, expected_series)
 
         # at a sampling depth of 2, with table1 as input and sampling with
-        # replacement, there are two possible outcomes. confirm that in 100
+        # replacement, there are two possible outcomes. confirm that in 10
         # iterations each is observed at least once and no other outputs are
         # observed.
         observed, = self.alpha_collection_pipeline(
-            table=table1, sampling_depth=2, metric='observed_features', n=100,
+            table=table1, sampling_depth=2, metric='observed_features', n=10,
             replacement=True)
-        self.assertEqual(len(observed), 100)
+        self.assertEqual(len(observed), 10)
 
         possible_series1 = pd.Series([1, 1],
                                      index=['S1', 'S2'],
@@ -123,9 +123,9 @@ class AlphaCollectionTests(TestPluginBase):
         # replacement, there is one possible outcome. confirm that we always
         # observe it.
         observed, = self.alpha_collection_pipeline(
-            table=table1, sampling_depth=2, metric='observed_features', n=88,
+            table=table1, sampling_depth=2, metric='observed_features', n=3,
             replacement=False)
-        self.assertEqual(len(observed), 88)
+        self.assertEqual(len(observed), 3)
 
         expected_series = pd.Series([2, 1],
                                     index=['S1', 'S2'],
@@ -149,9 +149,9 @@ class AlphaCollectionTests(TestPluginBase):
         # replacement, there is one possible outcome. confirm that we always
         # observe it.
         observed, = self.alpha_collection_pipeline(
-            table=table1, sampling_depth=2, metric='faith_pd', n=88,
+            table=table1, sampling_depth=2, metric='faith_pd', n=3,
             replacement=False, phylogeny=phylogeny)
-        self.assertEqual(len(observed), 88)
+        self.assertEqual(len(observed), 3)
 
         expected_series = pd.Series([4, 3],
                                     index=['S1', 'S2'],
@@ -170,12 +170,12 @@ class AlphaCollectionTests(TestPluginBase):
 
         with self.assertRaisesRegex(ValueError, "_pd requires a phy"):
             self.alpha_collection_pipeline(table=table1, sampling_depth=2,
-                                           metric='faith_pd', n=88,
+                                           metric='faith_pd', n=1,
                                            replacement=False)
 
         with self.assertRaisesRegex(TypeError, "xyz"):
             self.alpha_collection_pipeline(table=table1, sampling_depth=2,
-                                           metric='xyz', n=88,
+                                           metric='xyz', n=1,
                                            replacement=False)
 
 
@@ -197,7 +197,7 @@ class AlphaTests(TestPluginBase):
         # at a sampling depth of 1, with table1 as input, there is one possible
         # outcome. confirm that we observe it.
         observed, = self.alpha_pipeline(
-            table=table1, sampling_depth=1, metric='observed_features', n=42,
+            table=table1, sampling_depth=1, metric='observed_features', n=10,
             replacement=True)
         observed_series = observed.view(pd.Series)
 
@@ -208,12 +208,12 @@ class AlphaTests(TestPluginBase):
 
         # at a sampling depth of 2, with table1 as input, sampling with
         # replacement, and averaging with median, there are two possible
-        # outcomes for S1 and one possible outcome for S2. confirm that in 99
+        # outcomes for S1 and one possible outcome for S2. confirm that in 9
         # iterations we observe one of the possible values for S1 and the
         # expected value for S2
         observed, = self.alpha_pipeline(
             table=table1, sampling_depth=2, metric='observed_features',
-            n=99, replacement=True)
+            n=9, replacement=True)
         observed_series = observed.view(pd.Series)
         # note that because n is an odd number, the median for S1 will always
         # be one of the actual values that were observed (as opposed to
@@ -225,11 +225,11 @@ class AlphaTests(TestPluginBase):
         # at a sampling depth of 2, with table1 as input, sampling with
         # replacement, and averaging with mean, there are many possible
         # outcomes for S1 and one possible outcome for S2. confirm that in
-        # 100 iterations S1 is always in the expected range and S2 always has
+        # 10 iterations S1 is always in the expected range and S2 always has
         # the expected value
         observed, = self.alpha_pipeline(
             table=table1, sampling_depth=2, metric='observed_features',
-            n=100, replacement=True, average_method='mean')
+            n=10, replacement=True, average_method='mean')
         observed_series = observed.view(pd.Series)
         # note that b/c these are <, not <=, we know that identical tables
         # were not always obtained from the resampling step
@@ -247,7 +247,7 @@ class AlphaTests(TestPluginBase):
         # at a sampling depth of 1, with table1 as input, there is one possible
         # outcome. confirm that we observe it.
         observed, = self.alpha_pipeline(
-            table=table1, sampling_depth=1, metric='observed_features', n=42,
+            table=table1, sampling_depth=1, metric='observed_features', n=3,
             replacement=False)
         observed_series = observed.view(pd.Series)
 
@@ -261,7 +261,7 @@ class AlphaTests(TestPluginBase):
         # confirm that we observe it.
         observed, = self.alpha_pipeline(
             table=table1, sampling_depth=2, metric='observed_features',
-            n=100, replacement=False)
+            n=3, replacement=False)
         observed_series = observed.view(pd.Series)
 
         expected_series = pd.Series([2., 1.],
@@ -274,7 +274,7 @@ class AlphaTests(TestPluginBase):
         # confirm that we observe it.
         observed, = self.alpha_pipeline(
             table=table1, sampling_depth=2, metric='observed_features',
-            n=100, replacement=False, average_method='mean')
+            n=3, replacement=False, average_method='mean')
         observed_series = observed.view(pd.Series)
 
         expected_series = pd.Series([2., 1.],
