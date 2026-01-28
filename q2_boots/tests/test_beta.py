@@ -123,6 +123,55 @@ class BetaAverageHelperTests(TestCase):
         observed = _medoid(self.dms)
         self.assertEqual(observed, self.c)
 
+    def test_medoid_identical(self):
+        observed = _medoid([self.c, self.c, self.c])
+        self.assertEqual(observed, self.c)
+
+    def test_medoid_single(self):
+        observed = _medoid([self.c])
+        self.assertEqual(observed, self.c)
+
+    def test_medoid_all_matrices_same_distance(self):
+        a = skbio.DistanceMatrix([[0, 1, 2],
+                                  [1, 0, 1],
+                                  [2, 1, 0]], ids=('S1', 'S2', 'S3'))
+        b = skbio.DistanceMatrix([[0, 2, 1],
+                                  [2, 0, 1],
+                                  [1, 1, 0]], ids=('S1', 'S2', 'S3'))
+        c = skbio.DistanceMatrix([[0, 1, 1],
+                                  [1, 0, 2],
+                                  [1, 2, 0]], ids=('S1', 'S2', 'S3'))
+
+        dms = [a, b, c]
+        observed = _medoid(dms)
+        self.assertEqual(observed, a)
+
+    def test_medoid_empty(self):
+        with self.assertRaisesRegex(
+                ValueError, 'No distance matrices provided.'):
+            _ = _medoid([])
+
+    def test_medoid_mismatched_ids(self):
+        d = skbio.DistanceMatrix([[0, 6, 2],
+                                  [6, 0, 3],
+                                  [2, 3, 0]], ids=('S0', 'S1', 'S2'))
+        dms = [self.a, self.b, d]
+
+        with self.assertRaisesRegex(
+                ValueError, 'Not all distance matrices share the same ids.'):
+            _ = _medoid(dms)
+
+    def test_medoid_misshapen(self):
+        d = skbio.DistanceMatrix([[0, 6, 2, 4],
+                                  [6, 0, 3, 2],
+                                  [2, 3, 0, 3],
+                                  [4, 2, 3, 0]], ids=('S1', 'S2', 'S3', 'S4'))
+        dms = [self.a, self.b, d]
+
+        with self.assertRaisesRegex(
+                ValueError, 'Not all distance matrices are the same size.'):
+            _ = _medoid(dms)
+
 
 class BetaCollectionTests(TestPluginBase):
 

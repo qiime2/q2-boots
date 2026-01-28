@@ -6,12 +6,12 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import math
 import functools
 import warnings
 
 import numpy as np
 import skbio
-from hdmedians import medoid
 
 from q2_diversity_lib.beta import METRICS
 
@@ -69,7 +69,7 @@ def beta_collection(
 
 
 def beta(ctx, table, metric, sampling_depth, n, replacement,
-         average_method='non-metric-median', phylogeny=None,
+         average_method='medoid', phylogeny=None,
          bypass_tips=_METRIC_MOD_DEFAULTS['bypass_tips'],
          pseudocount=_METRIC_MOD_DEFAULTS['pseudocount'],
          alpha=_METRIC_MOD_DEFAULTS['alpha'],
@@ -113,9 +113,25 @@ def _per_cell_average(a, average_method):
 
 
 def _medoid(a):
+    if len(a) == 0:
+        raise ValueError("No distance matrices provided.")
+
+    for i in range(len(a) - 1):
+        if a[i].size != a[i + 1].size:
+            raise ValueError("Not all distance matrices are the same size.")
+        if a[i].ids != a[i + 1].ids:
+            raise ValueError("Not all distance matrices share the same ids.")
+
     condensed_dms = np.asarray([dm.condensed_form() for dm in a])
-    medoid_dm_index = medoid(condensed_dms, axis=0, indexonly=True)
-    return a[medoid_dm_index]
+    sums = np.zeros(len(condensed_dms))
+
+    for i in range(len(condensed_dms)):
+        for j in range(i):
+            distance = math.dist(condensed_dms[i], condensed_dms[j])
+            sums[i] += distance
+            sums[j] += distance
+
+    return a[np.argmin(sums)]
 
 
 def _validate_beta_metric(metric, phylogeny):

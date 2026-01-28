@@ -19,7 +19,7 @@ def kmer_diversity(ctx, table, sequences, sampling_depth, metadata, n,
                    replacement, kmer_size=16, tfidf=False,
                    max_df=1.0, min_df=1,
                    max_features=None, alpha_average_method='median',
-                   beta_average_method='non-metric-median', pc_dimensions=3,
+                   beta_average_method='medoid', pc_dimensions=3,
                    color_by=None, norm='None',
                    alpha_metrics=['pielou_e', 'observed_features', 'shannon'],
                    beta_metrics=['braycurtis', 'jaccard']):

@@ -34,11 +34,12 @@ test:
   - q2-feature-table >={{ q2_feature_table }}
   - q2-vizard >={{ q2_vizard }}
   - pytest
+  - pytest-xdist
   imports:
   - q2_boots
   - qiime2.plugins.boots
   commands:
-  - py.test --pyargs q2_boots
+  - py.test -n auto --pyargs q2_boots
 about:
   home: https://qiime2.org
   license: BSD-3-Clause
