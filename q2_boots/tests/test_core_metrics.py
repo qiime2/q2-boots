@@ -83,7 +83,7 @@ class CoreMetricsTests(TestPluginBase):
                                    sampling_depth=2,
                                    metadata=self.metadata,
                                    replacement=True,
-                                   n=9)
+                                   n=99)
         # n tables returned
         self.assertEqual(len(output[0]), 9)
         possible_table1 = pd.DataFrame(data=[[1.0, 1.0], [0.0, 2.0]],

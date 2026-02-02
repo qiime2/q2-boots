@@ -202,7 +202,7 @@ class BetaCollectionTests(TestPluginBase):
         # replacement, there are three possible Jaccard distance matrices.
         # Confirm that we see each of these at least once and no others.
         observed, = self.beta_collection_pipeline(
-            table=self.table1, metric='jaccard', sampling_depth=2, n=10,
+            table=self.table1, metric='jaccard', sampling_depth=2, n=100,
             replacement=True)
         self.assertEqual(len(observed), 10)
 
@@ -296,7 +296,7 @@ class BetaTests(TestPluginBase):
         observed = observed.view(skbio.DistanceMatrix)
         self.assertTrue(observed[('S1', 'S2')] in [0.0, 0.5, 1.0],
                         msg=(f"Medoid value ({observed[('S1', 'S2')]}) is "
-                             "not equal to 0.0, 0.5, 1.0."))
+                             "not equal to 0.0, 0.5, or 1.0."))
 
         observed, = self.beta_pipeline(table=self.table1,
                                        metric='jaccard',
