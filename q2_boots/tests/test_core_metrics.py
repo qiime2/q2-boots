@@ -85,7 +85,7 @@ class CoreMetricsTests(TestPluginBase):
                                    replacement=True,
                                    n=99)
         # n tables returned
-        self.assertEqual(len(output[0]), 9)
+        self.assertEqual(len(output[0]), 99)
         possible_table1 = pd.DataFrame(data=[[1.0, 1.0], [0.0, 2.0]],
                                        columns=['F1', 'F2'],
                                        index=['S1', 'S2'])

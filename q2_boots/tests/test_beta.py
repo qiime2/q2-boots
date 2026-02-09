@@ -204,7 +204,7 @@ class BetaCollectionTests(TestPluginBase):
         observed, = self.beta_collection_pipeline(
             table=self.table1, metric='jaccard', sampling_depth=2, n=100,
             replacement=True)
-        self.assertEqual(len(observed), 10)
+        self.assertEqual(len(observed), 100)
 
         possible_dm1 = skbio.DistanceMatrix([[0, 0.5], [0.5, 0]],
                                             ids=['S1', 'S2'])
