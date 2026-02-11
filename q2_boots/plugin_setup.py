@@ -97,7 +97,8 @@ _resample_input_descriptions = {
 _resample_parameter_descriptions = {
     'sampling_depth': _sampling_depth_description,
     'n': _n_description,
-    'replacement': _replacement_description
+    'replacement': _replacement_description,
+    'random_seed': ''
 }
 _resample_output_descriptions = {
     'resampled_tables': _resampled_tables_description
@@ -383,7 +384,8 @@ plugin.pipelines.register_function(
         'beta_average_method': 'Method to use for averaging beta diversity.',
         'replacement': _replacement_description,
         'pc_dimensions': _pc_dimensions_description,
-        'color_by': _color_by_description
+        'color_by': _color_by_description,
+        'random_seed': ''
     },
     output_descriptions={
         'resampled_tables': _resampled_tables_description,
