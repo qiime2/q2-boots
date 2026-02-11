@@ -6,14 +6,15 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-def resample(ctx, table, sampling_depth, n, replacement):
+def resample(ctx, table, sampling_depth, n, replacement, random_seed=None):
     rarefy_action = ctx.get_action('feature_table', 'rarefy')
     resampled_tables = []
 
     for i in range(n):
         resampled_table, = rarefy_action(table=table,
                                          sampling_depth=sampling_depth,
-                                         with_replacement=replacement)
+                                         with_replacement=replacement,
+                                         random_seed=random_seed)
         resampled_tables.append(resampled_table)
 
     return {f'resampled-table-{i}': t for i, t in enumerate(resampled_tables)}

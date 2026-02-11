@@ -16,13 +16,13 @@ from q2_boots._beta import (_validate_beta_metric, _get_beta_metric_action,
 
 
 def kmer_diversity(ctx, table, sequences, sampling_depth, metadata, n,
-                   replacement, kmer_size=16, tfidf=False,
-                   max_df=1.0, min_df=1,
-                   max_features=None, alpha_average_method='median',
+                   replacement, kmer_size=16, tfidf=False, max_df=1.0,
+                   min_df=1, max_features=None, alpha_average_method='median',
                    beta_average_method='medoid', pc_dimensions=3,
                    color_by=None, norm='None',
                    alpha_metrics=['pielou_e', 'observed_features', 'shannon'],
-                   beta_metrics=['braycurtis', 'jaccard']):
+                   beta_metrics=['braycurtis', 'jaccard'],
+                   random_seed=None):
 
     resample_action = ctx.get_action('boots', 'resample')
     kmerize_action = ctx.get_action('kmerizer', 'seqs_to_kmers')
@@ -39,7 +39,8 @@ def kmer_diversity(ctx, table, sequences, sampling_depth, metadata, n,
     resampled_tables, = resample_action(table=table,
                                         sampling_depth=sampling_depth,
                                         n=n,
-                                        replacement=replacement)
+                                        replacement=replacement,
+                                        random_seed=random_seed)
     kmer_tables = {}
     for key, resampled_table in resampled_tables.items():
         kmer_table, = kmerize_action(

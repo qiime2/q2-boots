@@ -51,7 +51,8 @@ def beta_collection(
         bypass_tips=_METRIC_MOD_DEFAULTS['bypass_tips'],
         pseudocount=_METRIC_MOD_DEFAULTS['pseudocount'],
         alpha=_METRIC_MOD_DEFAULTS['alpha'],
-        variance_adjusted=_METRIC_MOD_DEFAULTS['variance_adjusted']):
+        variance_adjusted=_METRIC_MOD_DEFAULTS['variance_adjusted'],
+        random_seed=None):
     _validate_beta_metric(metric, phylogeny)
 
     resample_action = ctx.get_action("boots", "resample")
@@ -62,7 +63,8 @@ def beta_collection(
     tables, = resample_action(table=table,
                               sampling_depth=sampling_depth,
                               n=n,
-                              replacement=replacement)
+                              replacement=replacement,
+                              random_seed=random_seed)
     results = _beta_collection_from_tables(tables, beta_metric_action)
 
     return results
@@ -73,7 +75,8 @@ def beta(ctx, table, metric, sampling_depth, n, replacement,
          bypass_tips=_METRIC_MOD_DEFAULTS['bypass_tips'],
          pseudocount=_METRIC_MOD_DEFAULTS['pseudocount'],
          alpha=_METRIC_MOD_DEFAULTS['alpha'],
-         variance_adjusted=_METRIC_MOD_DEFAULTS['variance_adjusted']):
+         variance_adjusted=_METRIC_MOD_DEFAULTS['variance_adjusted'],
+         random_seed=None):
     beta_collection_action = ctx.get_action('boots', 'beta_collection')
     beta_average_action = ctx.get_action('boots', 'beta_average')
     dms, = beta_collection_action(table=table,
@@ -85,7 +88,8 @@ def beta(ctx, table, metric, sampling_depth, n, replacement,
                                   replacement=replacement,
                                   variance_adjusted=variance_adjusted,
                                   alpha=alpha,
-                                  bypass_tips=bypass_tips)
+                                  bypass_tips=bypass_tips,
+                                  random_seed=random_seed)
 
     result, = beta_average_action(dms, average_method)
     return result

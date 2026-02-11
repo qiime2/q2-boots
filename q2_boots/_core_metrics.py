@@ -18,7 +18,7 @@ from q2_boots._beta import (_validate_beta_metric, _get_beta_metric_action,
 def core_metrics(ctx, table, sampling_depth, metadata, n, replacement,
                  phylogeny=None, alpha_average_method='median',
                  beta_average_method='medoid', pc_dimensions=3,
-                 color_by=None):
+                 color_by=None, random_seed=None):
 
     resample_action = ctx.get_action('boots', 'resample')
     alpha_average_action = ctx.get_action('boots', 'alpha_average')
@@ -42,7 +42,8 @@ def core_metrics(ctx, table, sampling_depth, metadata, n, replacement,
     resampled_tables, = resample_action(table=table,
                                         sampling_depth=sampling_depth,
                                         n=n,
-                                        replacement=replacement)
+                                        replacement=replacement,
+                                        random_seed=random_seed)
 
     alpha_vectors = {}
     for alpha_metric in alpha_metrics:

@@ -85,7 +85,8 @@ _resample_inputs = {
 _resample_parameters = {
     'sampling_depth': Int % Range(1, None),
     'n': Int % Range(1, None),
-    'replacement': Bool
+    'replacement': Bool,
+    'random_seed': Int
 }
 _resample_outputs = {
     'resampled_tables': Collection[FeatureTable[Frequency]]
@@ -172,14 +173,16 @@ _alpha_collection_parameters = {
                             alpha_metrics['PHYLO']['IMPL'] |
                             alpha_metrics['PHYLO']['UNIMPL']),
     'n': Int % Range(1, None),
-    'replacement': Bool
+    'replacement': Bool,
+    'random_seed': Int
 }
 
 _alpha_collection_parameter_descriptions = {
     'sampling_depth': _sampling_depth_description,
     'metric': 'The alpha diversity metric to be computed.',
     'n': _n_description,
-    'replacement': _replacement_description
+    'replacement': _replacement_description,
+    'random_seed': ''
 }
 
 plugin.pipelines.register_function(
@@ -273,7 +276,8 @@ _beta_collection_parameters = {
                 'sampling_depth': Int % Range(1, None),
                 'bypass_tips': Bool,
                 'variance_adjusted': Bool,
-                'alpha': Float % Range(0, 1, inclusive_end=True)
+                'alpha': Float % Range(0, 1, inclusive_end=True),
+                'random_seed': Int
 }
 
 _beta_collection_parameter_descriptions = {
@@ -291,7 +295,8 @@ _beta_collection_parameter_descriptions = {
     'variance_adjusted': ('Perform variance adjustment based on Chang et al. '
                           'BMC Bioinformatics (2011) for phylogenetic '
                           'diversity metrics.'),
-    'alpha': ('The alpha value used with the generalized UniFrac metric.')
+    'alpha': ('The alpha value used with the generalized UniFrac metric.'),
+    'random_seed': ''
 }
 
 
@@ -358,7 +363,8 @@ plugin.pipelines.register_function(
                                              'medoid'),
         'replacement': Bool,
         'pc_dimensions': Int,
-        'color_by': Str
+        'color_by': Str,
+        'random_seed': Int
     },
     outputs=[
         ('resampled_tables', Collection[FeatureTable[Frequency]]),
@@ -438,7 +444,8 @@ plugin.pipelines.register_function(
         'max_features': Int,
         'norm': Str % Choices(['None', 'l1', 'l2']),
         'pc_dimensions': Int,
-        'color_by': Str
+        'color_by': Str,
+        'random_seed': Int
     },
     outputs=[
         ('resampled_tables', Collection[FeatureTable[Frequency]]),

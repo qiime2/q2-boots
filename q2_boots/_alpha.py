@@ -28,7 +28,7 @@ def alpha_average(data: pd.Series, average_method: str) -> pd.Series:
 
 
 def alpha_collection(ctx, table, sampling_depth, metric, n,
-                     replacement, phylogeny=None):
+                     replacement, phylogeny=None, random_seed=None):
     _validate_alpha_metric(metric, phylogeny)
 
     resample_action = ctx.get_action("boots", "resample")
@@ -37,14 +37,15 @@ def alpha_collection(ctx, table, sampling_depth, metric, n,
     tables, = resample_action(table=table,
                               sampling_depth=sampling_depth,
                               n=n,
-                              replacement=replacement)
+                              replacement=replacement,
+                              random_seed=random_seed)
 
     results = _alpha_collection_from_tables(tables, alpha_metric_action)
     return results
 
 
 def alpha(ctx, table, sampling_depth, metric, n, replacement, phylogeny=None,
-          average_method='median'):
+          average_method='median', random_seed=None,):
     alpha_collection_action = ctx.get_action("boots", "alpha_collection")
     alpha_average_action = ctx.get_action('boots', 'alpha_average')
     sample_data, = alpha_collection_action(table=table,
@@ -52,7 +53,8 @@ def alpha(ctx, table, sampling_depth, metric, n, replacement, phylogeny=None,
                                            phylogeny=phylogeny,
                                            metric=metric,
                                            n=n,
-                                           replacement=replacement)
+                                           replacement=replacement,
+                                           random_seed=None)
 
     result, = alpha_average_action(sample_data, average_method)
     return result
