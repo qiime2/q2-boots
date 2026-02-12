@@ -66,6 +66,9 @@ _n_description = 'The number of resampled tables that should be generated.'
 _replacement_description = (
     'Resample `table` with replacement (i.e., bootstrap) or without '
     'replacement (i.e., rarefaction).')
+_random_seed_description = (
+    'Seed used in random number generation. Pass the same seed to get the '
+    'same results. Defaults to None for random results.')
 _resampled_tables_description = 'The `n` resampled tables.'
 _pc_dimensions_description = (
     'Number of principal coordinate dimensions to present in the 2D '
@@ -98,7 +101,7 @@ _resample_parameter_descriptions = {
     'sampling_depth': _sampling_depth_description,
     'n': _n_description,
     'replacement': _replacement_description,
-    'random_seed': ''
+    'random_seed': _random_seed_description
 }
 _resample_output_descriptions = {
     'resampled_tables': _resampled_tables_description
@@ -183,7 +186,7 @@ _alpha_collection_parameter_descriptions = {
     'metric': 'The alpha diversity metric to be computed.',
     'n': _n_description,
     'replacement': _replacement_description,
-    'random_seed': ''
+    'random_seed': _random_seed_description
 }
 
 plugin.pipelines.register_function(
@@ -297,7 +300,7 @@ _beta_collection_parameter_descriptions = {
                           'BMC Bioinformatics (2011) for phylogenetic '
                           'diversity metrics.'),
     'alpha': ('The alpha value used with the generalized UniFrac metric.'),
-    'random_seed': ''
+    'random_seed': _random_seed_description
 }
 
 
@@ -385,7 +388,7 @@ plugin.pipelines.register_function(
         'replacement': _replacement_description,
         'pc_dimensions': _pc_dimensions_description,
         'color_by': _color_by_description,
-        'random_seed': ''
+        'random_seed': _random_seed_description
     },
     output_descriptions={
         'resampled_tables': _resampled_tables_description,
