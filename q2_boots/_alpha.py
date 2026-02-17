@@ -54,7 +54,7 @@ def alpha(ctx, table, sampling_depth, metric, n, replacement, phylogeny=None,
                                            metric=metric,
                                            n=n,
                                            replacement=replacement,
-                                           random_seed=None)
+                                           random_seed=random_seed)
 
     result, = alpha_average_action(sample_data, average_method)
     return result
