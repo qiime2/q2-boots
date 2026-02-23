@@ -166,3 +166,6 @@ docs/book/q2doc.bib
 
 # Version file from versioningit
 _version.py
+
+# Editor stuff
+.vscode
