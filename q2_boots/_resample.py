@@ -7,17 +7,19 @@
 # ----------------------------------------------------------------------------
 import random
 
-# Numpy recommends using at least 128 bits of entropy to seed its rng which is
-# where this is gonna end up. This won't quite shake out like that given we are
-# seeding Python's rng with something else but we are gonna try our best.
-MIN_RECOMMENDED_NP_RNG_BITS = 128
+from .util import set_random_seed_if_needed, MIN_RECOMMENDED_NP_RNG_BITS
+
+from rachis.core.type import CaptureHolder
 
 
-def resample(ctx, table, sampling_depth, n, replacement, random_seed=None):
+def resample(ctx, table, sampling_depth, n, replacement,
+             random_seed: CaptureHolder = None):
     rarefy_action = ctx.get_action('feature_table', 'rarefy')
     resampled_tables = []
 
-    random.seed(random_seed)
+    set_random_seed_if_needed(random_seed)
+
+    random.seed(random_seed.value)
     for _ in range(n):
         _random_seed = random.randrange(2**MIN_RECOMMENDED_NP_RNG_BITS)
         resampled_table, = rarefy_action(table=table,

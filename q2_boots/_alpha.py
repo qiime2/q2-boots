@@ -9,8 +9,10 @@
 import functools
 
 import pandas as pd
+from rachis.core.type import CaptureHolder
 
 from q2_diversity_lib.alpha import METRICS
+from .util import set_random_seed_if_needed
 
 
 def alpha_average(data: pd.Series, average_method: str) -> pd.Series:
@@ -28,7 +30,9 @@ def alpha_average(data: pd.Series, average_method: str) -> pd.Series:
 
 
 def alpha_collection(ctx, table, sampling_depth, metric, n,
-                     replacement, phylogeny=None, random_seed=None):
+                     replacement, phylogeny=None,
+                     random_seed: CaptureHolder = None):
+    set_random_seed_if_needed(random_seed)
     _validate_alpha_metric(metric, phylogeny)
 
     resample_action = ctx.get_action("boots", "resample")
@@ -38,14 +42,15 @@ def alpha_collection(ctx, table, sampling_depth, metric, n,
                               sampling_depth=sampling_depth,
                               n=n,
                               replacement=replacement,
-                              random_seed=random_seed)
+                              random_seed=random_seed.value)
 
     results = _alpha_collection_from_tables(tables, alpha_metric_action)
     return results
 
 
 def alpha(ctx, table, sampling_depth, metric, n, replacement, phylogeny=None,
-          average_method='median', random_seed=None,):
+          average_method='median', random_seed: CaptureHolder = None):
+    set_random_seed_if_needed(random_seed)
     alpha_collection_action = ctx.get_action("boots", "alpha_collection")
     alpha_average_action = ctx.get_action('boots', 'alpha_average')
     sample_data, = alpha_collection_action(table=table,
@@ -54,7 +59,7 @@ def alpha(ctx, table, sampling_depth, metric, n, replacement, phylogeny=None,
                                            metric=metric,
                                            n=n,
                                            replacement=replacement,
-                                           random_seed=random_seed)
+                                           random_seed=random_seed.value)
 
     result, = alpha_average_action(sample_data, average_method)
     return result

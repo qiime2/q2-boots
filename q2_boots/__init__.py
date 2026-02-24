@@ -12,6 +12,7 @@ from ._alpha import alpha, alpha_collection, alpha_average
 from ._beta import beta, beta_collection, beta_average
 from ._core_metrics import core_metrics
 from ._kmer_diversity import kmer_diversity
+from .util import MIN_RECOMMENDED_NP_RNG_BITS
 
 try:
     from ._version import __version__
@@ -26,4 +27,5 @@ __all__ = ['resample',
            'beta_collection',
            'beta',
            'core_metrics',
-           'kmer_diversity']
+           'kmer_diversity',
+           'MIN_RECOMMENDED_NP_RNG_BITS']

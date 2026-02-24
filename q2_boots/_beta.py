@@ -13,7 +13,11 @@ import warnings
 import numpy as np
 import skbio
 
+from rachis.core.type import CaptureHolder
+
 from q2_diversity_lib.beta import METRICS
+
+from .util import set_random_seed_if_needed
 
 _METRIC_MOD_DEFAULTS = {
     'bypass_tips': False,
@@ -52,7 +56,8 @@ def beta_collection(
         pseudocount=_METRIC_MOD_DEFAULTS['pseudocount'],
         alpha=_METRIC_MOD_DEFAULTS['alpha'],
         variance_adjusted=_METRIC_MOD_DEFAULTS['variance_adjusted'],
-        random_seed=None):
+        random_seed: CaptureHolder = None):
+    set_random_seed_if_needed(random_seed)
     _validate_beta_metric(metric, phylogeny)
 
     resample_action = ctx.get_action("boots", "resample")
@@ -64,7 +69,7 @@ def beta_collection(
                               sampling_depth=sampling_depth,
                               n=n,
                               replacement=replacement,
-                              random_seed=random_seed)
+                              random_seed=random_seed.value)
     results = _beta_collection_from_tables(tables, beta_metric_action)
 
     return results
@@ -76,7 +81,8 @@ def beta(ctx, table, metric, sampling_depth, n, replacement,
          pseudocount=_METRIC_MOD_DEFAULTS['pseudocount'],
          alpha=_METRIC_MOD_DEFAULTS['alpha'],
          variance_adjusted=_METRIC_MOD_DEFAULTS['variance_adjusted'],
-         random_seed=None):
+         random_seed: CaptureHolder = None):
+    set_random_seed_if_needed(random_seed)
     beta_collection_action = ctx.get_action('boots', 'beta_collection')
     beta_average_action = ctx.get_action('boots', 'beta_average')
     dms, = beta_collection_action(table=table,
@@ -89,7 +95,7 @@ def beta(ctx, table, metric, sampling_depth, n, replacement,
                                   variance_adjusted=variance_adjusted,
                                   alpha=alpha,
                                   bypass_tips=bypass_tips,
-                                  random_seed=random_seed)
+                                  random_seed=random_seed.value)
 
     result, = beta_average_action(dms, average_method)
     return result
