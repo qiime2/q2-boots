@@ -9,10 +9,10 @@
 import functools
 
 import pandas as pd
-from rachis.core.type import CaptureHolder
+
+from rachis.plugin import CaptureHolder, set_np_random_seed
 
 from q2_diversity_lib.alpha import METRICS
-from .util import set_random_seed_if_needed
 
 
 def alpha_average(data: pd.Series, average_method: str) -> pd.Series:
@@ -32,7 +32,7 @@ def alpha_average(data: pd.Series, average_method: str) -> pd.Series:
 def alpha_collection(ctx, table, sampling_depth, metric, n,
                      replacement, phylogeny=None,
                      random_seed: CaptureHolder = None):
-    set_random_seed_if_needed(random_seed)
+    set_np_random_seed(random_seed)
     _validate_alpha_metric(metric, phylogeny)
 
     resample_action = ctx.get_action("boots", "resample")
@@ -50,7 +50,7 @@ def alpha_collection(ctx, table, sampling_depth, metric, n,
 
 def alpha(ctx, table, sampling_depth, metric, n, replacement, phylogeny=None,
           average_method='median', random_seed: CaptureHolder = None):
-    set_random_seed_if_needed(random_seed)
+    set_np_random_seed(random_seed)
     alpha_collection_action = ctx.get_action("boots", "alpha_collection")
     alpha_average_action = ctx.get_action('boots', 'alpha_average')
     sample_data, = alpha_collection_action(table=table,

@@ -10,13 +10,12 @@ import numpy as np
 from skbio import OrdinationResults
 from qiime2 import Metadata
 
-from rachis.core.type import CaptureHolder
+from rachis.plugin import CaptureHolder, set_np_random_seed
 
 from q2_boots._alpha import (_validate_alpha_metric, _get_alpha_metric_action,
                              _alpha_collection_from_tables)
 from q2_boots._beta import (_validate_beta_metric, _get_beta_metric_action,
                             _beta_collection_from_tables)
-from .util import set_random_seed_if_needed
 
 
 def kmer_diversity(ctx, table, sequences, sampling_depth, metadata, n,
@@ -27,7 +26,7 @@ def kmer_diversity(ctx, table, sequences, sampling_depth, metadata, n,
                    alpha_metrics=['pielou_e', 'observed_features', 'shannon'],
                    beta_metrics=['braycurtis', 'jaccard'],
                    random_seed: CaptureHolder = None):
-    set_random_seed_if_needed(random_seed)
+    set_np_random_seed(random_seed)
     resample_action = ctx.get_action('boots', 'resample')
     kmerize_action = ctx.get_action('kmerizer', 'seqs_to_kmers')
     alpha_average_action = ctx.get_action('boots', 'alpha_average')

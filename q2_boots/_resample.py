@@ -7,9 +7,7 @@
 # ----------------------------------------------------------------------------
 import random
 
-from .util import set_random_seed_if_needed, MIN_RECOMMENDED_NP_RNG_BITS
-
-from rachis.core.type import CaptureHolder
+from rachis.plugin import CaptureHolder, NP_RNG_SIZE, set_np_random_seed
 
 
 def resample(ctx, table, sampling_depth, n, replacement,
@@ -17,11 +15,11 @@ def resample(ctx, table, sampling_depth, n, replacement,
     rarefy_action = ctx.get_action('feature_table', 'rarefy')
     resampled_tables = []
 
-    set_random_seed_if_needed(random_seed)
+    set_np_random_seed(random_seed)
 
     random.seed(random_seed.value)
     for _ in range(n):
-        _random_seed = random.randrange(2**MIN_RECOMMENDED_NP_RNG_BITS)
+        _random_seed = random.randrange(NP_RNG_SIZE)
         resampled_table, = rarefy_action(table=table,
                                          sampling_depth=sampling_depth,
                                          with_replacement=replacement,

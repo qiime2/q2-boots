@@ -10,20 +10,19 @@ from skbio import OrdinationResults
 from qiime2 import Metadata
 import numpy as np
 
-from rachis.core.type import CaptureHolder
+from rachis.plugin import CaptureHolder, set_np_random_seed
 
 from q2_boots._alpha import (_validate_alpha_metric, _get_alpha_metric_action,
                              _alpha_collection_from_tables)
 from q2_boots._beta import (_validate_beta_metric, _get_beta_metric_action,
                             _beta_collection_from_tables)
-from .util import set_random_seed_if_needed
 
 
 def core_metrics(ctx, table, sampling_depth, metadata, n, replacement,
                  phylogeny=None, alpha_average_method='median',
                  beta_average_method='medoid', pc_dimensions=3,
                  color_by=None, random_seed: CaptureHolder = None):
-    set_random_seed_if_needed(random_seed)
+    set_np_random_seed(random_seed)
     resample_action = ctx.get_action('boots', 'resample')
     alpha_average_action = ctx.get_action('boots', 'alpha_average')
     beta_average_action = ctx.get_action('boots', 'beta_average')

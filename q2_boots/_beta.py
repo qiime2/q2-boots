@@ -13,11 +13,10 @@ import warnings
 import numpy as np
 import skbio
 
-from rachis.core.type import CaptureHolder
+from rachis.plugin import CaptureHolder, set_np_random_seed
 
 from q2_diversity_lib.beta import METRICS
 
-from .util import set_random_seed_if_needed
 
 _METRIC_MOD_DEFAULTS = {
     'bypass_tips': False,
@@ -57,7 +56,7 @@ def beta_collection(
         alpha=_METRIC_MOD_DEFAULTS['alpha'],
         variance_adjusted=_METRIC_MOD_DEFAULTS['variance_adjusted'],
         random_seed: CaptureHolder = None):
-    set_random_seed_if_needed(random_seed)
+    set_np_random_seed(random_seed)
     _validate_beta_metric(metric, phylogeny)
 
     resample_action = ctx.get_action("boots", "resample")
@@ -82,7 +81,7 @@ def beta(ctx, table, metric, sampling_depth, n, replacement,
          alpha=_METRIC_MOD_DEFAULTS['alpha'],
          variance_adjusted=_METRIC_MOD_DEFAULTS['variance_adjusted'],
          random_seed: CaptureHolder = None):
-    set_random_seed_if_needed(random_seed)
+    set_np_random_seed(random_seed)
     beta_collection_action = ctx.get_action('boots', 'beta_collection')
     beta_average_action = ctx.get_action('boots', 'beta_average')
     dms, = beta_collection_action(table=table,
