@@ -10,6 +10,7 @@ import functools
 
 import pandas as pd
 
+from rachis import Artifact
 from rachis.plugin import CaptureHolder, set_np_random_seed
 
 from q2_diversity_lib.alpha import METRICS
@@ -29,9 +30,15 @@ def alpha_average(data: pd.Series, average_method: str) -> pd.Series:
     return result
 
 
-def alpha_collection(ctx, table, sampling_depth, metric, n,
-                     replacement, phylogeny=None,
-                     random_seed: CaptureHolder = None):
+def alpha_collection(ctx,
+                     table: Artifact,
+                     sampling_depth: int,
+                     metric: str,
+                     n: int,
+                     replacement: bool,
+                     phylogeny: Artifact = None,
+                     random_seed: CaptureHolder = None) -> \
+        tuple[list[Artifact]]:
     set_np_random_seed(random_seed)
     _validate_alpha_metric(metric, phylogeny)
 
@@ -48,8 +55,15 @@ def alpha_collection(ctx, table, sampling_depth, metric, n,
     return results
 
 
-def alpha(ctx, table, sampling_depth, metric, n, replacement, phylogeny=None,
-          average_method='median', random_seed: CaptureHolder = None):
+def alpha(ctx,
+          table: Artifact,
+          sampling_depth: int,
+          metric: str,
+          n: int,
+          replacement: bool,
+          phylogeny: Artifact = None,
+          average_method: str = 'median',
+          random_seed: CaptureHolder = None) -> tuple[Artifact]:
     set_np_random_seed(random_seed)
     alpha_collection_action = ctx.get_action("boots", "alpha_collection")
     alpha_average_action = ctx.get_action('boots', 'alpha_average')

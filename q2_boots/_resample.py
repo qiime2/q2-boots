@@ -7,11 +7,16 @@
 # ----------------------------------------------------------------------------
 import random
 
+from rachis import Artifact
 from rachis.plugin import CaptureHolder, NP_RNG_SIZE, set_np_random_seed
 
 
-def resample(ctx, table, sampling_depth, n, replacement,
-             random_seed: CaptureHolder = None):
+def resample(ctx,
+             table: Artifact,
+             sampling_depth: int,
+             n: int,
+             replacement: bool,
+             random_seed: CaptureHolder = None) -> tuple[dict[str, Artifact]]:
     rarefy_action = ctx.get_action('feature_table', 'rarefy')
     resampled_tables = []
 
