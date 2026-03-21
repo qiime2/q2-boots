@@ -11,7 +11,7 @@ import functools
 import pandas as pd
 
 from rachis import Artifact
-from rachis.plugin import CaptureHolder, set_np_random_seed
+from rachis.plugin import IContext, CaptureHolder, set_np_random_seed
 
 from q2_diversity_lib.alpha import METRICS
 
@@ -30,7 +30,7 @@ def alpha_average(data: pd.Series, average_method: str) -> pd.Series:
     return result
 
 
-def alpha_collection(ctx,
+def alpha_collection(ctx: IContext,
                      table: Artifact,
                      sampling_depth: int,
                      metric: str,
@@ -55,7 +55,7 @@ def alpha_collection(ctx,
     return results
 
 
-def alpha(ctx,
+def alpha(ctx: IContext,
           table: Artifact,
           sampling_depth: int,
           metric: str,

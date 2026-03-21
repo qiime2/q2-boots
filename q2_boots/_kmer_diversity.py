@@ -10,7 +10,7 @@ import numpy as np
 from skbio import OrdinationResults
 
 from rachis import Artifact, Visualization, Metadata
-from rachis.plugin import CaptureHolder, set_np_random_seed
+from rachis.plugin import IContext, CaptureHolder, set_np_random_seed
 
 from q2_boots._alpha import (_validate_alpha_metric, _get_alpha_metric_action,
                              _alpha_collection_from_tables)
@@ -18,7 +18,7 @@ from q2_boots._beta import (_validate_beta_metric, _get_beta_metric_action,
                             _beta_collection_from_tables)
 
 
-def kmer_diversity(ctx,
+def kmer_diversity(ctx: IContext,
                    table: Artifact,
                    sequences: Artifact,
                    sampling_depth: int,

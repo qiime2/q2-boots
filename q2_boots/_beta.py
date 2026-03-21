@@ -14,7 +14,7 @@ import numpy as np
 import skbio
 
 from rachis import Artifact
-from rachis.plugin import CaptureHolder, set_np_random_seed
+from rachis.plugin import IContext, CaptureHolder, set_np_random_seed
 
 from q2_diversity_lib.beta import METRICS
 
@@ -50,7 +50,7 @@ def beta_average(data: skbio.DistanceMatrix,
 
 
 def beta_collection(
-        ctx,
+        ctx: IContext,
         table: Artifact,
         metric: str,
         sampling_depth: int,
@@ -80,7 +80,7 @@ def beta_collection(
     return results
 
 
-def beta(ctx,
+def beta(ctx: IContext,
          table: Artifact,
          metric: str,
          sampling_depth: int,

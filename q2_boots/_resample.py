@@ -8,10 +8,12 @@
 import random
 
 from rachis import Artifact
-from rachis.plugin import CaptureHolder, NP_RNG_SIZE, set_np_random_seed
+from rachis.plugin import (
+    IContext, CaptureHolder, NP_RNG_SIZE, set_np_random_seed
+)
 
 
-def resample(ctx,
+def resample(ctx: IContext,
              table: Artifact,
              sampling_depth: int,
              n: int,
