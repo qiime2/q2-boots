@@ -8,13 +8,10 @@ build:
     create_environment:
       - conda env create -p .env/ --file environment-files/development-q2-boots-environment.yml
       - conda install -p .env/ -c conda-forge nodejs
-      - conda run -p .env/ pip install 'q2doc@git+https://github.com/qiime2/q2doc@dev'
-      - conda run -p .env/ pip install 'jupyter-book==2.0.0a1'
+      - conda run -p .env/ pip install jupyter-book
       - conda run -p .env/ pip install .
     build:
       html:
-        - PATH=$(pwd)/.env/bin/:$PATH q2doc refresh-cache
-        - PATH=$(pwd)/.env/bin/:$PATH make autodoc
         - PATH=$(pwd)/.env/bin/:$PATH make html
         - mkdir -p $READTHEDOCS_OUTPUT
         - cp -a docs/book/_build/* $READTHEDOCS_OUTPUT/

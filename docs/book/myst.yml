@@ -9,33 +9,25 @@ project:
   # authors: ["Caporaso Lab"]
   # github:
   references:
-    q2doc-api-target: https://develop.qiime2.org/en/latest/
-    q2doc-usage-target: https://use.qiime2.org/en/latest/
-    q2doc-library-target: https://library.qiime2.org
-    q2doc-amplicon-target: https://amplicon-docs.readthedocs.io/en/latest/
-    q2doc-gut-to-soil-target: https://gut-to-soil-tutorial.readthedocs.io/en/latest/
-
-  plugins:
-    - type: executable
-      path: q2doc-plug.py
+    rachis-news-target: https://news.rachis.org/en/latest/
 
   toc:
     - file: intro.md
     - file: tutorial.md
     - title: Plugin Reference
       children:
-        - pattern: plugin-reference/plugins/*.md
+        - pattern: plugin-reference/plugins/boots.md
         - title: Artifact Classes and Formats
           children:
-            - pattern: plugin-reference/artifacts/*.md
-
+            - pattern: plugin-reference/artifacts/classes.md
+            - pattern: plugin-reference/artifacts/formats.md
 
   downloads:
     - file: _static/environment.yml
       title: Conda environment file
 
 site:
-  template: https://github.com/ebolyen/myst-book-theme-poc.git
+  template: book-theme
   options:
       folders: true
       favicon: _static/favicon.ico
