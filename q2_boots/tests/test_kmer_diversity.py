@@ -27,9 +27,15 @@ class KmerDiversityTests(TestPluginBase):
         self.table1 = qiime2.Artifact.import_data(
             "FeatureTable[Frequency]", table1, view_type=pd.DataFrame)
 
-        sequences = pd.Series(data=[skbio.DNA('GGACCCCTACGCCCATGGTAAACCGACTGGTCGTACGTGA'),  # noqa: E501
-                                    skbio.DNA('ACACGGACCTAAGAGCCGACCGCGTACAAAGGCGGGTACGTGCATTGGTTCCGGATCGCCCCGTACATCCGAAGAGCGTC')],  # noqa: E501
-                              index=['F1', 'F2'])
+        sequences = pd.Series(
+            data=[
+                skbio.DNA('GGACCCCTACGCCCATGGTAAACCGACTGGTCGTACGTGA'),
+                skbio.DNA(
+                    'ACACGGACCTAAGAGCCGACCGCGTACAAAGGCGGGTACGTGCATTGGTTCCGGATC'
+                    'GCCCCGTACATCCGAAGAGCGTC'
+                )
+            ],
+            index=['F1', 'F2'])
         self.sequences1 = qiime2.Artifact.import_data(
             "FeatureData[Sequence]", sequences, view_type=pd.Series)
 

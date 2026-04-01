@@ -23,10 +23,17 @@ def table_factory():
 
 
 def sequences_factory():
-    sequences = pd.Series(data=[skbio.DNA('GGACCCCTACGCCCATGGTAAACCGACTGGTCGTACGTGA'),  # noqa: E501
-                                skbio.DNA('ACACGGACCTAAGAGCCGACCGCGTACAAAGGCGGGTACGTGCATTGGTTCCGGATCGCCCCGTACATCCGAAGAGCGTC'),  # noqa: E501
-                                skbio.DNA('ACCCCGCCGGGTCATCATCATGCCAGCGACTACCA')],  # noqa: E501
-                          index=['F1', 'F2', 'F3'])
+    sequences = pd.Series(
+        data=[
+            skbio.DNA('GGACCCCTACGCCCATGGTAAACCGACTGGTCGTACGTGA'),
+            skbio.DNA(
+                'ACACGGACCTAAGAGCCGACCGCGTACAAAGGCGGGTACGTGCATTGGTTCCGGATCGCCC'
+                'CGTACATCCGAAGAGCGTC'
+            ),
+            skbio.DNA('ACCCCGCCGGGTCATCATCATGCCAGCGACTACCA')
+        ],
+        index=['F1', 'F2', 'F3']
+    )
     return qiime2.Artifact.import_data(
         "FeatureData[Sequence]", sequences, view_type=pd.Series)
 
