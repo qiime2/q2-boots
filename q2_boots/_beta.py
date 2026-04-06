@@ -14,7 +14,7 @@ import numpy as np
 import skbio
 
 from rachis import Artifact
-from rachis.plugin import IContext, CaptureHolder, set_np_random_seed
+from rachis.plugin import IContext, CaptureHolder, get_np_random_seed
 
 from q2_diversity_lib.beta import METRICS
 
@@ -62,7 +62,7 @@ def beta_collection(
         alpha: float = _METRIC_MOD_DEFAULTS['alpha'],
         variance_adjusted: bool = _METRIC_MOD_DEFAULTS['variance_adjusted'],
         random_seed: CaptureHolder = None) -> tuple[list[Artifact]]:
-    set_np_random_seed(random_seed)
+    random_int = CaptureHolder.get_or_set(random_seed, get_np_random_seed)
     _validate_beta_metric(metric, phylogeny)
 
     resample_action = ctx.get_action("boots", "resample")
@@ -74,7 +74,7 @@ def beta_collection(
                               sampling_depth=sampling_depth,
                               n=n,
                               replacement=replacement,
-                              random_seed=random_seed.value)
+                              random_seed=random_int)
     results = _beta_collection_from_tables(tables, beta_metric_action)
 
     return results
@@ -93,7 +93,7 @@ def beta(ctx: IContext,
          alpha: float = _METRIC_MOD_DEFAULTS['alpha'],
          variance_adjusted: bool = _METRIC_MOD_DEFAULTS['variance_adjusted'],
          random_seed: CaptureHolder = None) -> tuple[Artifact]:
-    set_np_random_seed(random_seed)
+    random_int = CaptureHolder.get_or_set(random_seed, get_np_random_seed)
     beta_collection_action = ctx.get_action('boots', 'beta_collection')
     beta_average_action = ctx.get_action('boots', 'beta_average')
     dms, = beta_collection_action(table=table,
@@ -106,7 +106,7 @@ def beta(ctx: IContext,
                                   variance_adjusted=variance_adjusted,
                                   alpha=alpha,
                                   bypass_tips=bypass_tips,
-                                  random_seed=random_seed.value)
+                                  random_seed=random_int)
 
     result, = beta_average_action(dms, average_method)
     return result

@@ -10,7 +10,7 @@ import numpy as np
 from skbio import OrdinationResults
 
 from rachis import Artifact, Visualization, Metadata
-from rachis.plugin import IContext, CaptureHolder, set_np_random_seed
+from rachis.plugin import IContext, CaptureHolder, get_np_random_seed
 
 from q2_boots._alpha import (_validate_alpha_metric, _get_alpha_metric_action,
                              _alpha_collection_from_tables)
@@ -44,7 +44,7 @@ def kmer_diversity(ctx: IContext,
             dict[str, Artifact], dict[str, Artifact], dict[str, Artifact],
             dict[str, Artifact], dict[str, Artifact], Visualization
         ]:
-    set_np_random_seed(random_seed)
+    random_int = CaptureHolder.get_or_set(random_seed, get_np_random_seed)
     resample_action = ctx.get_action('boots', 'resample')
     kmerize_action = ctx.get_action('kmerizer', 'seqs_to_kmers')
     alpha_average_action = ctx.get_action('boots', 'alpha_average')
@@ -61,7 +61,7 @@ def kmer_diversity(ctx: IContext,
                                         sampling_depth=sampling_depth,
                                         n=n,
                                         replacement=replacement,
-                                        random_seed=random_seed.value)
+                                        random_seed=random_int)
     kmer_tables = {}
     for key, resampled_table in resampled_tables.items():
         kmer_table, = kmerize_action(

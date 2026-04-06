@@ -9,7 +9,7 @@ import random
 
 from rachis import Artifact
 from rachis.plugin import (
-    IContext, CaptureHolder, NP_RNG_SIZE, set_np_random_seed
+    IContext, CaptureHolder, NP_RNG_SIZE, get_np_random_seed
 )
 
 
@@ -22,9 +22,9 @@ def resample(ctx: IContext,
     rarefy_action = ctx.get_action('feature_table', 'rarefy')
     resampled_tables = []
 
-    set_np_random_seed(random_seed)
+    random_int = CaptureHolder.get_or_set(random_seed, get_np_random_seed)
 
-    random.seed(random_seed.value)
+    random.seed(random_int)
     for _ in range(n):
         _random_seed = random.randrange(NP_RNG_SIZE)
         resampled_table, = rarefy_action(table=table,

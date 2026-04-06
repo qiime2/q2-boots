@@ -10,7 +10,7 @@ from skbio import OrdinationResults
 import numpy as np
 
 from rachis import Artifact, Visualization, Metadata
-from rachis.plugin import IContext, CaptureHolder, set_np_random_seed
+from rachis.plugin import IContext, CaptureHolder, get_np_random_seed
 
 from q2_boots._alpha import (_validate_alpha_metric, _get_alpha_metric_action,
                              _alpha_collection_from_tables)
@@ -34,7 +34,7 @@ def core_metrics(ctx: IContext,
             dict[str, Artifact], dict[str, Artifact], dict[str, Artifact],
             dict[str, Artifact], dict[str, Visualization], Visualization
         ]:
-    set_np_random_seed(random_seed)
+    random_int = CaptureHolder.get_or_set(random_seed, get_np_random_seed)
     resample_action = ctx.get_action('boots', 'resample')
     alpha_average_action = ctx.get_action('boots', 'alpha_average')
     beta_average_action = ctx.get_action('boots', 'beta_average')
@@ -58,7 +58,7 @@ def core_metrics(ctx: IContext,
                                         sampling_depth=sampling_depth,
                                         n=n,
                                         replacement=replacement,
-                                        random_seed=random_seed.value)
+                                        random_seed=random_int)
 
     alpha_vectors = {}
     for alpha_metric in alpha_metrics:
