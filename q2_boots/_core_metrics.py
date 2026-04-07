@@ -29,7 +29,7 @@ def core_metrics(ctx: IContext,
                  beta_average_method: str = 'medoid',
                  pc_dimensions: int = 3,
                  color_by: str = None,
-                 random_seed: CaptureHolder = None) -> \
+                 random_seed: CaptureHolder[int] = None) -> \
         tuple[
             dict[str, Artifact], dict[str, Artifact], dict[str, Artifact],
             dict[str, Artifact], dict[str, Visualization], Visualization

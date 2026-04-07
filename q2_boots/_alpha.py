@@ -37,7 +37,7 @@ def alpha_collection(ctx: IContext,
                      n: int,
                      replacement: bool,
                      phylogeny: Artifact = None,
-                     random_seed: CaptureHolder = None) -> \
+                     random_seed: CaptureHolder[int] = None) -> \
         tuple[list[Artifact]]:
     random_int = CaptureHolder.get_or_set(random_seed, get_np_random_seed)
     _validate_alpha_metric(metric, phylogeny)
@@ -63,7 +63,7 @@ def alpha(ctx: IContext,
           replacement: bool,
           phylogeny: Artifact = None,
           average_method: str = 'median',
-          random_seed: CaptureHolder = None) -> tuple[Artifact]:
+          random_seed: CaptureHolder[int] = None) -> tuple[Artifact]:
     random_int = CaptureHolder.get_or_set(random_seed, get_np_random_seed)
     alpha_collection_action = ctx.get_action("boots", "alpha_collection")
     alpha_average_action = ctx.get_action('boots', 'alpha_average')

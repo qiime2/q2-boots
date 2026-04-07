@@ -61,7 +61,7 @@ def beta_collection(
         pseudocount: int = _METRIC_MOD_DEFAULTS['pseudocount'],
         alpha: float = _METRIC_MOD_DEFAULTS['alpha'],
         variance_adjusted: bool = _METRIC_MOD_DEFAULTS['variance_adjusted'],
-        random_seed: CaptureHolder = None) -> tuple[list[Artifact]]:
+        random_seed: CaptureHolder[int] = None) -> tuple[list[Artifact]]:
     random_int = CaptureHolder.get_or_set(random_seed, get_np_random_seed)
     _validate_beta_metric(metric, phylogeny)
 
@@ -92,7 +92,7 @@ def beta(ctx: IContext,
          pseudocount: int = _METRIC_MOD_DEFAULTS['pseudocount'],
          alpha: float = _METRIC_MOD_DEFAULTS['alpha'],
          variance_adjusted: bool = _METRIC_MOD_DEFAULTS['variance_adjusted'],
-         random_seed: CaptureHolder = None) -> tuple[Artifact]:
+         random_seed: CaptureHolder[int] = None) -> tuple[Artifact]:
     random_int = CaptureHolder.get_or_set(random_seed, get_np_random_seed)
     beta_collection_action = ctx.get_action('boots', 'beta_collection')
     beta_average_action = ctx.get_action('boots', 'beta_average')

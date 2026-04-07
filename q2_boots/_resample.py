@@ -18,7 +18,8 @@ def resample(ctx: IContext,
              sampling_depth: int,
              n: int,
              replacement: bool,
-             random_seed: CaptureHolder = None) -> tuple[dict[str, Artifact]]:
+             random_seed: CaptureHolder[int] = None) -> \
+        tuple[dict[str, Artifact]]:
     rarefy_action = ctx.get_action('feature_table', 'rarefy')
     resampled_tables = []
 

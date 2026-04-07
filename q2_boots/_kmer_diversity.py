@@ -39,7 +39,7 @@ def kmer_diversity(ctx: IContext,
                        'pielou_e', 'observed_features', 'shannon'
                     ],
                    beta_metrics: list[str] = ['braycurtis', 'jaccard'],
-                   random_seed: CaptureHolder = None) -> \
+                   random_seed: CaptureHolder[int] = None) -> \
         tuple[
             dict[str, Artifact], dict[str, Artifact], dict[str, Artifact],
             dict[str, Artifact], dict[str, Artifact], Visualization
