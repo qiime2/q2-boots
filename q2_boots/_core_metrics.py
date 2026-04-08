@@ -9,6 +9,7 @@
 from skbio import OrdinationResults
 from qiime2 import Metadata
 import numpy as np
+import biom
 from q2_boots._alpha import (_validate_alpha_metric, _get_alpha_metric_action,
                              _alpha_collection_from_tables)
 from q2_boots._beta import (_validate_beta_metric, _get_beta_metric_action,
@@ -18,7 +19,7 @@ from q2_boots._beta import (_validate_beta_metric, _get_beta_metric_action,
 def core_metrics(ctx, table, sampling_depth, metadata, n, replacement,
                  phylogeny=None, alpha_average_method='median',
                  beta_average_method='medoid', pc_dimensions=3,
-                 color_by=None):
+                 color_by=None, ignore_missing_samples=False):
 
     resample_action = ctx.get_action('boots', 'resample')
     alpha_average_action = ctx.get_action('boots', 'alpha_average')
@@ -26,6 +27,18 @@ def core_metrics(ctx, table, sampling_depth, metadata, n, replacement,
     pcoa_action = ctx.get_action('diversity', 'pcoa')
     emperor_plot_action = ctx.get_action('emperor', 'plot')
     scatter_action = ctx.get_action('vizard', 'scatterplot_2d')
+
+    # Emperor will fail if we have mismatched id so we should check and fail
+    # early if needed
+    tab = table.view(biom.Table)
+    table_ids = set(tab.ids())
+    metadata_ids = set(metadata.to_dataframe().index)
+
+    sample_ids = table_ids.intersection(metadata_ids)
+    if len(sample_ids) != len(table_ids) and not ignore_missing_samples:
+        raise ValueError('Missing samples in metadata: %r. Override this error'
+                         'by using the `ignore_missing_samples` argument' %
+                         table_ids.difference(metadata_ids))
 
     alpha_metrics = ['pielou_e', 'observed_features', 'shannon']
     beta_metrics = ['braycurtis', 'jaccard']
@@ -70,8 +83,9 @@ def core_metrics(ctx, table, sampling_depth, metadata, n, replacement,
     for key, dm in beta_dms.items():
         pcoa_results, = pcoa_action(dm)
         pcoas[key] = pcoa_results
-        emperor_plot, = emperor_plot_action(pcoa=pcoa_results,
-                                            metadata=metadata)
+        emperor_plot, =\
+            emperor_plot_action(pcoa=pcoa_results, metadata=metadata,
+                                ignore_missing_samples=ignore_missing_samples)
         emperor_plots[key] = emperor_plot
 
     for pcoa, name in zip(pcoas.values(), beta_metrics):

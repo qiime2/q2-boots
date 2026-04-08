@@ -8,7 +8,7 @@
 
 import qiime2
 from qiime2.plugin.testing import TestPluginBase
-from qiime2.plugin import Visualization
+from qiime2.plugin import Visualization, Collection
 import pandas as pd
 import numpy.testing as npt
 import pandas.testing as pdt
@@ -37,6 +37,12 @@ class CoreMetricsTests(TestPluginBase):
                                 columns=['blank'])
         metadata.index.name = 'sample-id'
         self.metadata = qiime2.Metadata(metadata)
+
+        tiny_metadata = pd.DataFrame(['not'],
+                                     index=['S1'],
+                                     columns=['blank'])
+        tiny_metadata.index.name = 'sample-id'
+        self.tiny_metadata = qiime2.Metadata(tiny_metadata)
 
     def test_core_metrics_wo_replacement(self):
         output = self.core_metrics(table=self.table1,
@@ -207,3 +213,24 @@ class CoreMetricsTests(TestPluginBase):
 
         # vizard scatter plot returned
         self.assertEqual(output[5].type, Visualization)
+
+    def test_core_metrics_ignore_missing_failure(self):
+        with self.assertRaisesRegex(ValueError,
+                                    'Missing samples in metadata: *'):
+
+            self.core_metrics(table=self.table1,
+                              sampling_depth=2,
+                              metadata=self.tiny_metadata,
+                              replacement=False,
+                              n=10)
+
+    def test_core_metrics_ignore_missing(self):
+        output = self.core_metrics(table=self.table1,
+                                   sampling_depth=2,
+                                   metadata=self.tiny_metadata,
+                                   replacement=False,
+                                   n=10,
+                                   ignore_missing_samples=True)
+        # prove that emperor plot is returned because it is enforcing
+        # the missing samples error
+        self.assertEqual(output[4].type, Collection[Visualization])

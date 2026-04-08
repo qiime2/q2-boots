@@ -358,7 +358,8 @@ plugin.pipelines.register_function(
                                              'medoid'),
         'replacement': Bool,
         'pc_dimensions': Int,
-        'color_by': Str
+        'color_by': Str,
+        'ignore_missing_samples': Bool
     },
     outputs=[
         ('resampled_tables', Collection[FeatureTable[Frequency]]),
@@ -377,7 +378,15 @@ plugin.pipelines.register_function(
         'beta_average_method': 'Method to use for averaging beta diversity.',
         'replacement': _replacement_description,
         'pc_dimensions': _pc_dimensions_description,
-        'color_by': _color_by_description
+        'color_by': _color_by_description,
+        'ignore_missing_samples': 'If set to `True` samples'
+                                  'without metadata are included by '
+                                  'setting all metadata values to: '
+                                  '"This element has no metadata". By '
+                                  'default an exception will be raised if '
+                                  'missing elements are encountered. Note, '
+                                  'this flag only takes effect if there is at '
+                                  'least one overlapping element.'
     },
     output_descriptions={
         'resampled_tables': _resampled_tables_description,
