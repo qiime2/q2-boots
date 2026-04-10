@@ -29,7 +29,7 @@ def _table_list_contains_different_tables(tables):
     tables = [table.view(pd.DataFrame) for table in tables.values()]
 
     for i in range(len(tables)):
-        for j in range(len(tables) - i):
+        for j in range(i + 1, len(tables)):
             if not tables[i].equals(tables[j]):
                 return True
 
