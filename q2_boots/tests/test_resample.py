@@ -12,6 +12,30 @@ import qiime2
 from qiime2.plugin.testing import TestPluginBase
 
 
+def _table_collection_equality(tables1, tables2):
+    # Determine if two Collections of tables contain the same tables or not
+    tables1 = [table.view(pd.DataFrame) for table in tables1.values()]
+    tables2 = [table.view(pd.DataFrame) for table in tables2.values()]
+
+    for table1, table2 in zip(tables1, tables2):
+        if not table1.equals(table2):
+            return False
+
+    return True
+
+
+def _table_list_contains_different_tables(tables):
+    # Determine if all tables in a collection of tables are identical or not
+    tables = [table.view(pd.DataFrame) for table in tables.values()]
+
+    for i in range(len(tables)):
+        for j in range(i + 1, len(tables)):
+            if not tables[i].equals(tables[j]):
+                return True
+
+    return False
+
+
 class ResampleTests(TestPluginBase):
     package = 'q2_boots.tests'
 
@@ -99,6 +123,29 @@ class ResampleTests(TestPluginBase):
             if len(obs_table.columns) != 2:
                 exactly_two_features_always_observed = False
         self.assertTrue(exactly_two_features_always_observed)
+
+    def test_rarefy_seed_cross_iteration(self):
+        tables1, = self.resample_pipeline(table=self.table_artifact2,
+                                          sampling_depth=1,
+                                          n=10,
+                                          replacement=True,
+                                          random_seed=123)
+        tables2, = self.resample_pipeline(table=self.table_artifact2,
+                                          sampling_depth=1,
+                                          n=10,
+                                          replacement=True,
+                                          random_seed=123)
+        tables3, = self.resample_pipeline(table=self.table_artifact2,
+                                          sampling_depth=1,
+                                          n=10,
+                                          replacement=True,
+                                          random_seed=321)
+
+        self.assertTrue(_table_collection_equality(tables1, tables2))
+        self.assertFalse(_table_collection_equality(tables1, tables3))
+
+        self.assertTrue(_table_list_contains_different_tables(tables1))
+        self.assertTrue(_table_list_contains_different_tables(tables3))
 
     # test helper functions
     def _expected_sampling_depth(self, replacement):

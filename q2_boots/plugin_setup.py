@@ -66,6 +66,9 @@ _n_description = 'The number of resampled tables that should be generated.'
 _replacement_description = (
     'Resample `table` with replacement (i.e., bootstrap) or without '
     'replacement (i.e., rarefaction).')
+_random_seed_description = (
+    'Seed used in random number generation. Pass the same seed to get the '
+    'same results. Defaults to None for random results.')
 _resampled_tables_description = 'The `n` resampled tables.'
 _pc_dimensions_description = (
     'Number of principal coordinate dimensions to present in the 2D '
@@ -85,7 +88,8 @@ _resample_inputs = {
 _resample_parameters = {
     'sampling_depth': Int % Range(1, None),
     'n': Int % Range(1, None),
-    'replacement': Bool
+    'replacement': Bool,
+    'random_seed': Int
 }
 _resample_outputs = {
     'resampled_tables': Collection[FeatureTable[Frequency]]
@@ -96,7 +100,8 @@ _resample_input_descriptions = {
 _resample_parameter_descriptions = {
     'sampling_depth': _sampling_depth_description,
     'n': _n_description,
-    'replacement': _replacement_description
+    'replacement': _replacement_description,
+    'random_seed': _random_seed_description
 }
 _resample_output_descriptions = {
     'resampled_tables': _resampled_tables_description
@@ -172,14 +177,16 @@ _alpha_collection_parameters = {
                             alpha_metrics['PHYLO']['IMPL'] |
                             alpha_metrics['PHYLO']['UNIMPL']),
     'n': Int % Range(1, None),
-    'replacement': Bool
+    'replacement': Bool,
+    'random_seed': Int
 }
 
 _alpha_collection_parameter_descriptions = {
     'sampling_depth': _sampling_depth_description,
     'metric': 'The alpha diversity metric to be computed.',
     'n': _n_description,
-    'replacement': _replacement_description
+    'replacement': _replacement_description,
+    'random_seed': _random_seed_description
 }
 
 plugin.pipelines.register_function(
@@ -273,7 +280,8 @@ _beta_collection_parameters = {
                 'sampling_depth': Int % Range(1, None),
                 'bypass_tips': Bool,
                 'variance_adjusted': Bool,
-                'alpha': Float % Range(0, 1, inclusive_end=True)
+                'alpha': Float % Range(0, 1, inclusive_end=True),
+                'random_seed': Int
 }
 
 _beta_collection_parameter_descriptions = {
@@ -291,7 +299,8 @@ _beta_collection_parameter_descriptions = {
     'variance_adjusted': ('Perform variance adjustment based on Chang et al. '
                           'BMC Bioinformatics (2011) for phylogenetic '
                           'diversity metrics.'),
-    'alpha': ('The alpha value used with the generalized UniFrac metric.')
+    'alpha': ('The alpha value used with the generalized UniFrac metric.'),
+    'random_seed': _random_seed_description
 }
 
 
@@ -358,7 +367,8 @@ plugin.pipelines.register_function(
                                              'medoid'),
         'replacement': Bool,
         'pc_dimensions': Int,
-        'color_by': Str
+        'color_by': Str,
+        'random_seed': Int
     },
     outputs=[
         ('resampled_tables', Collection[FeatureTable[Frequency]]),
@@ -377,7 +387,8 @@ plugin.pipelines.register_function(
         'beta_average_method': 'Method to use for averaging beta diversity.',
         'replacement': _replacement_description,
         'pc_dimensions': _pc_dimensions_description,
-        'color_by': _color_by_description
+        'color_by': _color_by_description,
+        'random_seed': _random_seed_description
     },
     output_descriptions={
         'resampled_tables': _resampled_tables_description,
@@ -438,7 +449,8 @@ plugin.pipelines.register_function(
         'max_features': Int,
         'norm': Str % Choices(['None', 'l1', 'l2']),
         'pc_dimensions': Int,
-        'color_by': Str
+        'color_by': Str,
+        'random_seed': Int
     },
     outputs=[
         ('resampled_tables', Collection[FeatureTable[Frequency]]),

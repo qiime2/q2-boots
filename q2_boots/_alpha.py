@@ -10,6 +10,9 @@ import functools
 
 import pandas as pd
 
+from rachis import Artifact
+from rachis.plugin import IContext, CaptureHolder, get_np_random_seed
+
 from q2_diversity_lib.alpha import METRICS
 
 
@@ -27,8 +30,16 @@ def alpha_average(data: pd.Series, average_method: str) -> pd.Series:
     return result
 
 
-def alpha_collection(ctx, table, sampling_depth, metric, n,
-                     replacement, phylogeny=None):
+def alpha_collection(ctx: IContext,
+                     table: Artifact,
+                     sampling_depth: int,
+                     metric: str,
+                     n: int,
+                     replacement: bool,
+                     phylogeny: Artifact = None,
+                     random_seed: CaptureHolder[int] = None) -> \
+        tuple[list[Artifact]]:
+    random_int = CaptureHolder.get_or_set(random_seed, get_np_random_seed)
     _validate_alpha_metric(metric, phylogeny)
 
     resample_action = ctx.get_action("boots", "resample")
@@ -37,14 +48,23 @@ def alpha_collection(ctx, table, sampling_depth, metric, n,
     tables, = resample_action(table=table,
                               sampling_depth=sampling_depth,
                               n=n,
-                              replacement=replacement)
+                              replacement=replacement,
+                              random_seed=random_int)
 
     results = _alpha_collection_from_tables(tables, alpha_metric_action)
     return results
 
 
-def alpha(ctx, table, sampling_depth, metric, n, replacement, phylogeny=None,
-          average_method='median'):
+def alpha(ctx: IContext,
+          table: Artifact,
+          sampling_depth: int,
+          metric: str,
+          n: int,
+          replacement: bool,
+          phylogeny: Artifact = None,
+          average_method: str = 'median',
+          random_seed: CaptureHolder[int] = None) -> tuple[Artifact]:
+    random_int = CaptureHolder.get_or_set(random_seed, get_np_random_seed)
     alpha_collection_action = ctx.get_action("boots", "alpha_collection")
     alpha_average_action = ctx.get_action('boots', 'alpha_average')
     sample_data, = alpha_collection_action(table=table,
@@ -52,7 +72,8 @@ def alpha(ctx, table, sampling_depth, metric, n, replacement, phylogeny=None,
                                            phylogeny=phylogeny,
                                            metric=metric,
                                            n=n,
-                                           replacement=replacement)
+                                           replacement=replacement,
+                                           random_seed=random_int)
 
     result, = alpha_average_action(sample_data, average_method)
     return result

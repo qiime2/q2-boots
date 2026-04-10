@@ -7,19 +7,34 @@
 # ----------------------------------------------------------------------------
 
 from skbio import OrdinationResults
-from qiime2 import Metadata
 import numpy as np
+
+from rachis import Artifact, Visualization, Metadata
+from rachis.plugin import IContext, CaptureHolder, get_np_random_seed
+
 from q2_boots._alpha import (_validate_alpha_metric, _get_alpha_metric_action,
                              _alpha_collection_from_tables)
 from q2_boots._beta import (_validate_beta_metric, _get_beta_metric_action,
                             _beta_collection_from_tables)
 
 
-def core_metrics(ctx, table, sampling_depth, metadata, n, replacement,
-                 phylogeny=None, alpha_average_method='median',
-                 beta_average_method='medoid', pc_dimensions=3,
-                 color_by=None):
-
+def core_metrics(ctx: IContext,
+                 table: Artifact,
+                 sampling_depth: int,
+                 metadata: Metadata,
+                 n: int,
+                 replacement: bool,
+                 phylogeny: Artifact = None,
+                 alpha_average_method: str = 'median',
+                 beta_average_method: str = 'medoid',
+                 pc_dimensions: int = 3,
+                 color_by: str = None,
+                 random_seed: CaptureHolder[int] = None) -> \
+        tuple[
+            dict[str, Artifact], dict[str, Artifact], dict[str, Artifact],
+            dict[str, Artifact], dict[str, Visualization], Visualization
+        ]:
+    random_int = CaptureHolder.get_or_set(random_seed, get_np_random_seed)
     resample_action = ctx.get_action('boots', 'resample')
     alpha_average_action = ctx.get_action('boots', 'alpha_average')
     beta_average_action = ctx.get_action('boots', 'beta_average')
@@ -42,7 +57,8 @@ def core_metrics(ctx, table, sampling_depth, metadata, n, replacement,
     resampled_tables, = resample_action(table=table,
                                         sampling_depth=sampling_depth,
                                         n=n,
-                                        replacement=replacement)
+                                        replacement=replacement,
+                                        random_seed=random_int)
 
     alpha_vectors = {}
     for alpha_metric in alpha_metrics:

@@ -8,22 +8,43 @@
 
 import numpy as np
 from skbio import OrdinationResults
-from qiime2 import Metadata
+
+from rachis import Artifact, Visualization, Metadata
+from rachis.plugin import IContext, CaptureHolder, get_np_random_seed
+
 from q2_boots._alpha import (_validate_alpha_metric, _get_alpha_metric_action,
                              _alpha_collection_from_tables)
 from q2_boots._beta import (_validate_beta_metric, _get_beta_metric_action,
                             _beta_collection_from_tables)
 
 
-def kmer_diversity(ctx, table, sequences, sampling_depth, metadata, n,
-                   replacement, kmer_size=16, tfidf=False,
-                   max_df=1.0, min_df=1,
-                   max_features=None, alpha_average_method='median',
-                   beta_average_method='medoid', pc_dimensions=3,
-                   color_by=None, norm='None',
-                   alpha_metrics=['pielou_e', 'observed_features', 'shannon'],
-                   beta_metrics=['braycurtis', 'jaccard']):
-
+def kmer_diversity(ctx: IContext,
+                   table: Artifact,
+                   sequences: Artifact,
+                   sampling_depth: int,
+                   metadata: Metadata,
+                   n: int,
+                   replacement: bool,
+                   kmer_size: int = 16,
+                   tfidf: bool = False,
+                   max_df: float = 1.0,
+                   min_df: float = 1,
+                   max_features: int = None,
+                   alpha_average_method: str = 'median',
+                   beta_average_method: str = 'medoid',
+                   pc_dimensions: int = 3,
+                   color_by: str = None,
+                   norm: str = 'None',
+                   alpha_metrics: list[str] = [
+                       'pielou_e', 'observed_features', 'shannon'
+                    ],
+                   beta_metrics: list[str] = ['braycurtis', 'jaccard'],
+                   random_seed: CaptureHolder[int] = None) -> \
+        tuple[
+            dict[str, Artifact], dict[str, Artifact], dict[str, Artifact],
+            dict[str, Artifact], dict[str, Artifact], Visualization
+        ]:
+    random_int = CaptureHolder.get_or_set(random_seed, get_np_random_seed)
     resample_action = ctx.get_action('boots', 'resample')
     kmerize_action = ctx.get_action('kmerizer', 'seqs_to_kmers')
     alpha_average_action = ctx.get_action('boots', 'alpha_average')
@@ -39,7 +60,8 @@ def kmer_diversity(ctx, table, sequences, sampling_depth, metadata, n,
     resampled_tables, = resample_action(table=table,
                                         sampling_depth=sampling_depth,
                                         n=n,
-                                        replacement=replacement)
+                                        replacement=replacement,
+                                        random_seed=random_int)
     kmer_tables = {}
     for key, resampled_table in resampled_tables.items():
         kmer_table, = kmerize_action(
