@@ -410,7 +410,7 @@ plugin.pipelines.register_function(
                  'alpha and beta diversity artifacts are returned, along with '
                  'PCoA matrices, Emperor plots, and a 2D scatter plot '
                  'including alpha diversity values and PCoA of all beta '
-                 'diversity metrics.\n\nTip: If you're running out of memory '
+                 'diversity metrics.\n\nTip: If you\'re running out of memory '
                  'when running this command, dropping features that are '
                  'present in only one or a few samples can dramatically '
                  'reduce the memory usage. This is illustrated in the '
