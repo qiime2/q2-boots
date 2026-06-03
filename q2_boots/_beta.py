@@ -49,19 +49,13 @@ def beta_average(data: skbio.DistanceMatrix,
                          "mean, and medoid.")
 
 
-def beta_collection(
-        ctx: IContext,
-        table: Artifact,
-        metric: str,
-        sampling_depth: int,
-        n: int,
-        replacement: bool,
-        phylogeny: Artifact = None,
-        bypass_tips: bool = _METRIC_MOD_DEFAULTS['bypass_tips'],
-        pseudocount: int = _METRIC_MOD_DEFAULTS['pseudocount'],
-        alpha: float = _METRIC_MOD_DEFAULTS['alpha'],
-        variance_adjusted: bool = _METRIC_MOD_DEFAULTS['variance_adjusted'],
-        random_seed: CaptureHolder[int] = None) -> tuple[list[Artifact]]:
+def beta_collection(ctx, table, metric, sampling_depth, n,
+                    replacement, phylogeny=None,
+                    bypass_tips=_METRIC_MOD_DEFAULTS['bypass_tips'],
+                    pseudocount=_METRIC_MOD_DEFAULTS['pseudocount'],
+                    alpha=_METRIC_MOD_DEFAULTS['alpha'],
+                    variance_adjusted=_METRIC_MOD_DEFAULTS['variance_adjusted'],
+                    random_seed=None):
     random_int = CaptureHolder.get_or_set(random_seed, get_np_random_seed)
     _validate_beta_metric(metric, phylogeny)
 
@@ -80,19 +74,13 @@ def beta_collection(
     return results
 
 
-def beta(ctx: IContext,
-         table: Artifact,
-         metric: str,
-         sampling_depth: int,
-         n: int,
-         replacement: bool,
-         average_method: str = 'medoid',
-         phylogeny: Artifact = None,
-         bypass_tips: bool = _METRIC_MOD_DEFAULTS['bypass_tips'],
-         pseudocount: int = _METRIC_MOD_DEFAULTS['pseudocount'],
-         alpha: float = _METRIC_MOD_DEFAULTS['alpha'],
-         variance_adjusted: bool = _METRIC_MOD_DEFAULTS['variance_adjusted'],
-         random_seed: CaptureHolder[int] = None) -> tuple[Artifact]:
+def beta(ctx, table, metric, sampling_depth, n, replacement,
+         average_method='medoid', phylogeny=None,
+         bypass_tips=_METRIC_MOD_DEFAULTS['bypass_tips'],
+         pseudocount=_METRIC_MOD_DEFAULTS['pseudocount'],
+         alpha=_METRIC_MOD_DEFAULTS['alpha'],
+         variance_adjusted=_METRIC_MOD_DEFAULTS['variance_adjusted'],
+         random_seed=None):
     random_int = CaptureHolder.get_or_set(random_seed, get_np_random_seed)
     beta_collection_action = ctx.get_action('boots', 'beta_collection')
     beta_average_action = ctx.get_action('boots', 'beta_average')

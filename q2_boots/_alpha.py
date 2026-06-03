@@ -30,15 +30,8 @@ def alpha_average(data: pd.Series, average_method: str) -> pd.Series:
     return result
 
 
-def alpha_collection(ctx: IContext,
-                     table: Artifact,
-                     sampling_depth: int,
-                     metric: str,
-                     n: int,
-                     replacement: bool,
-                     phylogeny: Artifact = None,
-                     random_seed: CaptureHolder[int] = None) -> \
-        tuple[list[Artifact]]:
+def alpha_collection(ctx, table, sampling_depth, metric, n,
+                     replacement, phylogeny=None, random_seed=None):
     random_int = CaptureHolder.get_or_set(random_seed, get_np_random_seed)
     _validate_alpha_metric(metric, phylogeny)
 
@@ -55,15 +48,9 @@ def alpha_collection(ctx: IContext,
     return results
 
 
-def alpha(ctx: IContext,
-          table: Artifact,
-          sampling_depth: int,
-          metric: str,
-          n: int,
-          replacement: bool,
-          phylogeny: Artifact = None,
-          average_method: str = 'median',
-          random_seed: CaptureHolder[int] = None) -> tuple[Artifact]:
+def alpha(ctx, table, sampling_depth, metric, n,
+          replacement, phylogeny=None, average_method='median',
+          random_seed=None):
     random_int = CaptureHolder.get_or_set(random_seed, get_np_random_seed)
     alpha_collection_action = ctx.get_action("boots", "alpha_collection")
     alpha_average_action = ctx.get_action('boots', 'alpha_average')
