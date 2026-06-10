@@ -26,7 +26,7 @@ def resample(ctx: IContext,
     random_int = CaptureHolder.get_or_set(random_seed, get_np_random_seed)
 
     random.seed(random_int)
-    random_seeds = random.choices(NP_RNG_SIZE, k=n)
+    random_seeds = random.choices(range(NP_RNG_SIZE), k=n)
     for _random_seed in random_seeds:
         resampled_table, = rarefy_action(table=table,
                                          sampling_depth=sampling_depth,
