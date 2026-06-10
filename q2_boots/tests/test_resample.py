@@ -124,7 +124,7 @@ class ResampleTests(TestPluginBase):
                 exactly_two_features_always_observed = False
         self.assertTrue(exactly_two_features_always_observed)
 
-    def test_aaaa_rarefy_seed_cross_iteration(self):
+    def test_rarefy_seed_cross_iteration(self):
         tables1, = self.resample_pipeline(table=self.table_artifact2,
                                           sampling_depth=1,
                                           n=10,
