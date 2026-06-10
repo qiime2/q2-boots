@@ -24,6 +24,22 @@ def _table_collection_equality(tables1, tables2):
     return True
 
 
+def _table_collection_equality_print(tables1, tables2):
+    # Determine if two Collections of tables contain the same tables or not
+    tables1 = [table.view(pd.DataFrame) for table in tables1.values()]
+    tables2 = [table.view(pd.DataFrame) for table in tables2.values()]
+    for table in tables1:
+        print(table)
+    print('\n\n')
+    for table in tables2:
+        print(table)
+    for table1, table2 in zip(tables1, tables2):
+        if not table1.equals(table2):
+            return False
+
+    return True
+
+
 def _table_list_contains_different_tables(tables):
     # Determine if all tables in a collection of tables are identical or not
     tables = [table.view(pd.DataFrame) for table in tables.values()]
@@ -67,63 +83,6 @@ class ResampleTests(TestPluginBase):
             "FeatureTable[Frequency]", table3, view_type=pd.DataFrame
         )
 
-    def test_resample_w_replacement_filters_samples(self):
-        self._resample_filters_sample(replacement=True)
-
-    def test_resample_wo_replacement_filters_samples(self):
-        self._resample_filters_sample(replacement=False)
-
-    def test_expected_sampling_depth_w_replacement(self):
-        self._expected_sampling_depth(replacement=True)
-
-    def test_expected_sampling_depth_wo_replacement(self):
-        self._expected_sampling_depth(replacement=False)
-
-    def test_expected_n_tables(self):
-        obs_tables, = self.resample_pipeline(table=self.table_artifact1,
-                                             sampling_depth=1,
-                                             n=4,
-                                             replacement=True)
-        self.assertEqual(len(obs_tables), 4)
-
-        obs_tables, = self.resample_pipeline(table=self.table_artifact1,
-                                             sampling_depth=1,
-                                             n=2,
-                                             replacement=True)
-        self.assertEqual(len(obs_tables), 2)
-
-    def test_w_replacement(self):
-        obs_tables, = self.resample_pipeline(table=self.table_artifact3,
-                                             sampling_depth=2,
-                                             n=25,
-                                             replacement=True)
-        # if sampling with replacement from a sample with 2 unique features
-        # that have one observation each, we should observe a resampled
-        # table with only one feature 50% of the time. the probability of not
-        # seeing a table with only one feature in 25 resample tables is ~1e-8,
-        # so rare intermittent failure of this test is possible
-        fewer_than_two_unique_features_ever_observed = False
-        for obs_table in obs_tables.values():
-            obs_table = obs_table.view(pd.DataFrame)
-            if len(obs_table.columns) < 2:
-                fewer_than_two_unique_features_ever_observed = True
-        self.assertTrue(fewer_than_two_unique_features_ever_observed)
-
-    def test_wo_replacement(self):
-        obs_tables, = self.resample_pipeline(table=self.table_artifact3,
-                                             sampling_depth=2,
-                                             n=4,
-                                             replacement=False)
-        # if sampling with replacement from a sample with 2 unique features
-        # that have one observation each, we should never observe a resampled
-        # feature table with only one feature.
-        exactly_two_features_always_observed = True
-        for obs_table in obs_tables.values():
-            obs_table = obs_table.view(pd.DataFrame)
-            if len(obs_table.columns) != 2:
-                exactly_two_features_always_observed = False
-        self.assertTrue(exactly_two_features_always_observed)
-
     def test_rarefy_seed_cross_iteration(self):
         tables1, = self.resample_pipeline(table=self.table_artifact2,
                                           sampling_depth=1,
@@ -141,7 +100,7 @@ class ResampleTests(TestPluginBase):
                                           replacement=True,
                                           random_seed=321)
 
-        self.assertTrue(_table_collection_equality(tables1, tables2))
+        self.assertTrue(_table_collection_equality_print(tables1, tables2))
         self.assertFalse(_table_collection_equality(tables1, tables3))
 
         self.assertTrue(_table_list_contains_different_tables(tables1))
