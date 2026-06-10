@@ -83,7 +83,64 @@ class ResampleTests(TestPluginBase):
             "FeatureTable[Frequency]", table3, view_type=pd.DataFrame
         )
 
-    def test_rarefy_seed_cross_iteration(self):
+    def test_resample_w_replacement_filters_samples(self):
+        self._resample_filters_sample(replacement=True)
+
+    def test_resample_wo_replacement_filters_samples(self):
+        self._resample_filters_sample(replacement=False)
+
+    def test_expected_sampling_depth_w_replacement(self):
+        self._expected_sampling_depth(replacement=True)
+
+    def test_expected_sampling_depth_wo_replacement(self):
+        self._expected_sampling_depth(replacement=False)
+
+    def test_expected_n_tables(self):
+        obs_tables, = self.resample_pipeline(table=self.table_artifact1,
+                                             sampling_depth=1,
+                                             n=4,
+                                             replacement=True)
+        self.assertEqual(len(obs_tables), 4)
+
+        obs_tables, = self.resample_pipeline(table=self.table_artifact1,
+                                             sampling_depth=1,
+                                             n=2,
+                                             replacement=True)
+        self.assertEqual(len(obs_tables), 2)
+
+    def test_w_replacement(self):
+        obs_tables, = self.resample_pipeline(table=self.table_artifact3,
+                                             sampling_depth=2,
+                                             n=25,
+                                             replacement=True)
+        # if sampling with replacement from a sample with 2 unique features
+        # that have one observation each, we should observe a resampled
+        # table with only one feature 50% of the time. the probability of not
+        # seeing a table with only one feature in 25 resample tables is ~1e-8,
+        # so rare intermittent failure of this test is possible
+        fewer_than_two_unique_features_ever_observed = False
+        for obs_table in obs_tables.values():
+            obs_table = obs_table.view(pd.DataFrame)
+            if len(obs_table.columns) < 2:
+                fewer_than_two_unique_features_ever_observed = True
+        self.assertTrue(fewer_than_two_unique_features_ever_observed)
+
+    def test_wo_replacement(self):
+        obs_tables, = self.resample_pipeline(table=self.table_artifact3,
+                                             sampling_depth=2,
+                                             n=4,
+                                             replacement=False)
+        # if sampling with replacement from a sample with 2 unique features
+        # that have one observation each, we should never observe a resampled
+        # feature table with only one feature.
+        exactly_two_features_always_observed = True
+        for obs_table in obs_tables.values():
+            obs_table = obs_table.view(pd.DataFrame)
+            if len(obs_table.columns) != 2:
+                exactly_two_features_always_observed = False
+        self.assertTrue(exactly_two_features_always_observed)
+
+    def test_aaaa_rarefy_seed_cross_iteration(self):
         tables1, = self.resample_pipeline(table=self.table_artifact2,
                                           sampling_depth=1,
                                           n=10,
