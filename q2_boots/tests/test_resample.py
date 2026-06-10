@@ -24,22 +24,6 @@ def _table_collection_equality(tables1, tables2):
     return True
 
 
-def _table_collection_equality_print(tables1, tables2):
-    # Determine if two Collections of tables contain the same tables or not
-    tables1 = [table.view(pd.DataFrame) for table in tables1.values()]
-    tables2 = [table.view(pd.DataFrame) for table in tables2.values()]
-    for table in tables1:
-        print(table)
-    print('\n\n')
-    for table in tables2:
-        print(table)
-    for table1, table2 in zip(tables1, tables2):
-        if not table1.equals(table2):
-            return False
-
-    return True
-
-
 def _table_list_contains_different_tables(tables):
     # Determine if all tables in a collection of tables are identical or not
     tables = [table.view(pd.DataFrame) for table in tables.values()]
@@ -157,7 +141,7 @@ class ResampleTests(TestPluginBase):
                                           replacement=True,
                                           random_seed=321)
 
-        self.assertTrue(_table_collection_equality_print(tables1, tables2))
+        self.assertTrue(_table_collection_equality(tables1, tables2))
         self.assertFalse(_table_collection_equality(tables1, tables3))
 
         self.assertTrue(_table_list_contains_different_tables(tables1))
