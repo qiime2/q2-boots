@@ -5,7 +5,7 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-import random
+from np.random import RandomState
 
 from rachis import Artifact
 from rachis.plugin import (
@@ -25,11 +25,11 @@ def resample(ctx: IContext,
 
     random_int = CaptureHolder.get_or_set(random_seed, get_np_random_seed)
 
-    random.seed(random_int)
-    random_seeds = random.choices(range(NP_RNG_SIZE), k=n)
-    for _random_seed in random_seeds:
+    random_state = RandomState(random_int)
+    for _ in range(n):
+        _random_seed = random_state.randint(NP_RNG_SIZE)
         resampled_table, = rarefy_action(table=table,
-                                         sampling_depth=sampling_depth,
+                                         sampgitling_depth=sampling_depth,
                                          with_replacement=replacement,
                                          random_seed=_random_seed)
         resampled_tables.append(resampled_table)
