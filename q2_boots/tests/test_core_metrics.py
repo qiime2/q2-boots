@@ -14,7 +14,6 @@ import numpy.testing as npt
 import pandas.testing as pdt
 import skbio
 
-
 class CoreMetricsTests(TestPluginBase):
 
     package = 'q2_boots'
@@ -47,8 +46,8 @@ class CoreMetricsTests(TestPluginBase):
         # n tables returned
         self.assertEqual(len(output[0]), 2)
         expected_table = pd.DataFrame(data=[[1.0, 1.0], [0.0, 2.0]],
-                                      columns=['F1', 'F2'],
-                                      index=['S1', 'S2'])
+                                       columns=['F1', 'F2'],
+                                       index=['S1', 'S2'])
         for e in output[0].values():
             observed_table = e.view(pd.DataFrame)
             pdt.assert_frame_equal(observed_table, expected_table)
@@ -61,8 +60,8 @@ class CoreMetricsTests(TestPluginBase):
         self.assertTrue(set(output[1].keys()) == skbio_lt_060_alpha_keys or
                         set(output[1].keys()) == skbio_gte_060_alpha_keys)
         expected_obs_features = pd.Series([2.0, 1.0],
-                                          index=['S1', 'S2'],
-                                          name='observed_features')
+                                           index=['S1', 'S2'],
+                                           name='observed_features')
         observed_obs_features = output[1]['observed_features'].view(pd.Series)
         pdt.assert_series_equal(observed_obs_features, expected_obs_features)
 
@@ -87,14 +86,14 @@ class CoreMetricsTests(TestPluginBase):
         # n tables returned
         self.assertEqual(len(output[0]), 99)
         possible_table1 = pd.DataFrame(data=[[1.0, 1.0], [0.0, 2.0]],
-                                       columns=['F1', 'F2'],
-                                       index=['S1', 'S2'])
+                                        columns=['F1', 'F2'],
+                                        index=['S1', 'S2'])
         possible_table2 = pd.DataFrame(data=[[2.0, 0.0], [0.0, 2.0]],
-                                       columns=['F1', 'F2'],
-                                       index=['S1', 'S2'])
+                                        columns=['F1', 'F2'],
+                                        index=['S1', 'S2'])
         possible_table3 = pd.DataFrame(data=[[2.0], [2.0]],
-                                       columns=['F2'],
-                                       index=['S1', 'S2'])
+                                        columns=['F2'],
+                                        index=['S1', 'S2'])
         count_possible_table1_observed = 0
         count_possible_table2_observed = 0
         count_possible_table3_observed = 0
@@ -129,7 +128,7 @@ class CoreMetricsTests(TestPluginBase):
         self.assertTrue(observed_obs_features['S1'] == 1.0 or
                         observed_obs_features['S1'] == 2.0,
                         msg=f"Median value ({observed_obs_features['S1']}) is "
-                            "not equal to 1.0 or 2.0.")
+                        "not equal to 1.0 or 2.0.")
         self.assertEqual(observed_obs_features['S2'], 1.0)
 
         # expected dms, pcoas, and plots returned
@@ -157,8 +156,8 @@ class CoreMetricsTests(TestPluginBase):
         # n tables returned
         self.assertEqual(len(output[0]), 10)
         expected_table = pd.DataFrame(data=[[1.0, 1.0], [0.0, 2.0]],
-                                      columns=['F1', 'F2'],
-                                      index=['S1', 'S2'])
+                                       columns=['F1', 'F2'],
+                                       index=['S1', 'S2'])
         for e in output[0].values():
             observed_table = e.view(pd.DataFrame)
             pdt.assert_frame_equal(observed_table, expected_table)
@@ -172,8 +171,8 @@ class CoreMetricsTests(TestPluginBase):
         self.assertTrue(set(output[1].keys()) == skbio_lt_060_alpha_keys or
                         set(output[1].keys()) == skbio_gte_060_alpha_keys)
         expected_obs_features = pd.Series([2.0, 1.0],
-                                          index=['S1', 'S2'],
-                                          name='observed_features')
+                                           index=['S1', 'S2'],
+                                           name='observed_features')
         observed_obs_features = output[1]['observed_features'].view(pd.Series)
         pdt.assert_series_equal(observed_obs_features, expected_obs_features)
 
@@ -196,10 +195,75 @@ class CoreMetricsTests(TestPluginBase):
 
         expected_unweighted_unifrac = skbio.DistanceMatrix(
             [[0, 0.25], [0.25, 0]], ids=['S1', 'S2'])
-        observed_unweighted_unifrac = \
-            output[2]['unweighted_unifrac'].view(skbio.DistanceMatrix)
+        observed_unweighted_unifrac =             output[2]['unweighted_unifrac'].view(skbio.DistanceMatrix)
         # Floating point error seemingly induced by going from
         # unifrac_binaries=1.4 to unifrac_binaries=1.5 made this necessary
+        self.assertEqual(observed_unweighted_unifrac.ids,
+                         expected_unweighted_unifrac.ids)
+        npt.assert_allclose(observed_unweighted_unifrac.data,
+                            expected_unweighted_unifrac.data)
+
+        # vizard scatter plot returned
+        self.assertEqual(output[5].type, Visualization)
+
+    def test_core_metrics_custom_metrics(self):
+        output = self.core_metrics(table=self.table1,
+                                   sampling_depth=2,
+                                   metadata=self.metadata,
+                                   replacement=False,
+                                   n=2,
+                                   alpha_metrics=['observed_features'],
+                                   beta_metrics=['jaccard'])
+        # n tables returned
+        self.assertEqual(len(output[0]), 2)
+
+        # Only the requested alpha metric should be present
+        self.assertEqual(set(output[1].keys()), set(['observed_features']))
+        expected_obs_features = pd.Series([2.0, 1.0],
+                                           index=['S1', 'S2'],
+                                           name='observed_features')
+        observed_obs_features = output[1]['observed_features'].view(pd.Series)
+        pdt.assert_series_equal(observed_obs_features, expected_obs_features)
+
+        # Only the requested beta metric should be present
+        self.assertEqual(set(output[2].keys()), set(['jaccard']))
+        self.assertEqual(set(output[3].keys()), set(['jaccard']))
+        self.assertEqual(set(output[4].keys()), set(['jaccard']))
+        expected_jaccard = skbio.DistanceMatrix([[0, 0.5], [0.5, 0]],
+                                                ids=['S1', 'S2'])
+        observed_jaccard = output[2]['jaccard'].view(skbio.DistanceMatrix)
+        self.assertEqual(observed_jaccard, expected_jaccard)
+
+        # vizard scatter plot returned
+        self.assertEqual(output[5].type, Visualization)
+
+    def test_core_metrics_custom_metrics_phylogenetic(self):
+        output = self.core_metrics(table=self.table1,
+                                   phylogeny=self.phylogeny,
+                                   sampling_depth=2,
+                                   metadata=self.metadata,
+                                   replacement=False,
+                                   n=2,
+                                   alpha_metrics=['faith_pd'],
+                                   beta_metrics=['unweighted_unifrac'])
+        # n tables returned
+        self.assertEqual(len(output[0]), 2)
+
+        # Only the requested alpha metric should be present
+        self.assertEqual(set(output[1].keys()), set(['faith_pd']))
+        expected_faith_pd = pd.Series([4.0, 3.0],
+                                      index=['S1', 'S2'],
+                                      name='faith_pd')
+        observed_faith_pd = output[1]['faith_pd'].view(pd.Series)
+        pdt.assert_series_equal(observed_faith_pd, expected_faith_pd)
+
+        # Only the requested beta metric should be present
+        self.assertEqual(set(output[2].keys()), set(['unweighted_unifrac']))
+        self.assertEqual(set(output[3].keys()), set(['unweighted_unifrac']))
+        self.assertEqual(set(output[4].keys()), set(['unweighted_unifrac']))
+        expected_unweighted_unifrac = skbio.DistanceMatrix(
+            [[0, 0.25], [0.25, 0]], ids=['S1', 'S2'])
+        observed_unweighted_unifrac =             output[2]['unweighted_unifrac'].view(skbio.DistanceMatrix)
         self.assertEqual(observed_unweighted_unifrac.ids,
                          expected_unweighted_unifrac.ids)
         npt.assert_allclose(observed_unweighted_unifrac.data,

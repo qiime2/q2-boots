@@ -8,8 +8,9 @@
 
 import numpy as np
 from skbio import OrdinationResults
+import qiime2
 
-from rachis import Artifact, Visualization, Metadata
+from rachis import Artifact, Visualization
 from rachis.plugin import IContext, CaptureHolder, get_np_random_seed
 
 from q2_boots._alpha import (_validate_alpha_metric, _get_alpha_metric_action,
@@ -18,32 +19,14 @@ from q2_boots._beta import (_validate_beta_metric, _get_beta_metric_action,
                             _beta_collection_from_tables)
 
 
-def kmer_diversity(ctx: IContext,
-                   table: Artifact,
-                   sequences: Artifact,
-                   sampling_depth: int,
-                   metadata: Metadata,
-                   n: int,
-                   replacement: bool,
-                   kmer_size: int = 16,
-                   tfidf: bool = False,
-                   max_df: float = 1.0,
-                   min_df: float = 1,
-                   max_features: int = None,
-                   alpha_average_method: str = 'median',
-                   beta_average_method: str = 'medoid',
-                   pc_dimensions: int = 3,
-                   color_by: str = None,
-                   norm: str = 'None',
-                   alpha_metrics: list[str] = [
-                       'pielou_e', 'observed_features', 'shannon'
-                    ],
-                   beta_metrics: list[str] = ['braycurtis', 'jaccard'],
-                   random_seed: CaptureHolder[int] = None) -> \
-        tuple[
-            dict[str, Artifact], dict[str, Artifact], dict[str, Artifact],
-            dict[str, Artifact], dict[str, Artifact], Visualization
-        ]:
+def kmer_diversity(ctx, table, sequences, sampling_depth, metadata, n,
+                   replacement, kmer_size=16, tfidf=False, max_df=1.0,
+                   min_df=1, max_features=None, alpha_average_method='median',
+                   beta_average_method='medoid', pc_dimensions=3,
+                   color_by=None, norm='None',
+                   alpha_metrics=None,
+                   beta_metrics=None,
+                   random_seed=None):
     random_int = CaptureHolder.get_or_set(random_seed, get_np_random_seed)
     resample_action = ctx.get_action('boots', 'resample')
     kmerize_action = ctx.get_action('kmerizer', 'seqs_to_kmers')
@@ -51,6 +34,11 @@ def kmer_diversity(ctx: IContext,
     beta_average_action = ctx.get_action('boots', 'beta_average')
     pcoa_action = ctx.get_action('diversity', 'pcoa')
     scatter_action = ctx.get_action('vizard', 'scatterplot_2d')
+
+    if alpha_metrics is None:
+        alpha_metrics = ['pielou_e', 'observed_features', 'shannon']
+    if beta_metrics is None:
+        beta_metrics = ['braycurtis', 'jaccard']
 
     for alpha_metric in alpha_metrics:
         _validate_alpha_metric(alpha_metric, phylogeny=None)
@@ -78,7 +66,12 @@ def kmer_diversity(ctx: IContext,
         avg_alpha_vector, = alpha_average_action(
             alpha_collection, alpha_average_method)
         alpha_vectors[alpha_metric] = avg_alpha_vector
-        metadata = avg_alpha_vector.view(Metadata).merge(metadata)
+        import pandas as pd
+        alpha_series = avg_alpha_vector.view(pd.Series)
+        alpha_df = alpha_series.to_frame(name=alpha_metric)
+        alpha_df.index.name = 'sample-id'
+        alpha_metadata = qiime2.Metadata(alpha_df)
+        metadata = alpha_metadata.merge(metadata)
 
     beta_dms = {}
     for beta_metric in beta_metrics:
@@ -98,15 +91,11 @@ def kmer_diversity(ctx: IContext,
     for pcoa, name in zip(pcoas.values(), beta_metrics):
         pc_result = pcoa.view(OrdinationResults)
         prop_explained = pc_result.proportion_explained[:pc_dimensions].values
-        # replace nan with 0.0 (indicating no variation explained) - this
-        # prevents failure in situations of extreme low diversity (like the
-        # usage example), and only impacts the scatter plot (not the actual
-        # ordination results being produced by the action)
         prop_explained = np.nan_to_num(prop_explained)
-        pc_result = pcoa.view(Metadata).to_dataframe().iloc[:, :pc_dimensions]
+        pc_result = pcoa.view(qiime2.Metadata).to_dataframe().iloc[:, :pc_dimensions]
         pc_result.columns = ['{0} {1} ({2}%)'.format(name, c, int(p * 100)) for
                              c, p in zip(pc_result.columns, prop_explained)]
-        metadata = Metadata(pc_result).merge(metadata)
+        metadata = qiime2.Metadata(pc_result).merge(metadata)
 
     scatter_plot, = scatter_action(metadata=metadata, color_by=color_by)
 

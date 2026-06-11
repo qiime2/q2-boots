@@ -50,7 +50,6 @@ plugin = Plugin(
     citations=[citations['Raspet2025']]
 )
 
-
 _feature_table_description = 'The input feature table.'
 _phylogeny_description = (
     'The phylogenetic tree to use in phylogenetic diversity '
@@ -214,7 +213,7 @@ plugin.pipelines.register_function(
 
 _alpha_parameters = _alpha_collection_parameters | _alpha_average_parameters
 _alpha_parameter_descriptions = (_alpha_collection_parameter_descriptions |
-                                 _alpha_average_parameter_descriptions)
+                                   _alpha_average_parameter_descriptions)
 
 plugin.pipelines.register_function(
     function=q2_boots.alpha,
@@ -270,24 +269,24 @@ plugin.methods.register_function(
 )
 
 _beta_collection_parameters = {
-                'metric': Str % Choices(beta_metrics['NONPHYLO']['IMPL'] |
-                                        beta_metrics['NONPHYLO']['UNIMPL'] |
-                                        beta_metrics['PHYLO']['IMPL'] |
-                                        beta_metrics['PHYLO']['UNIMPL']),
-                'pseudocount': Int % Range(1, None),
-                'replacement': Bool,
-                'n': Int % Range(1, None),
-                'sampling_depth': Int % Range(1, None),
-                'bypass_tips': Bool,
-                'variance_adjusted': Bool,
-                'alpha': Float % Range(0, 1, inclusive_end=True),
-                'random_seed': Int
+    'metric': Str % Choices(beta_metrics['NONPHYLO']['IMPL'] |
+                            beta_metrics['NONPHYLO']['UNIMPL'] |
+                            beta_metrics['PHYLO']['IMPL'] |
+                            beta_metrics['PHYLO']['UNIMPL']),
+    'pseudocount': Int % Range(1, None),
+    'replacement': Bool,
+    'n': Int % Range(1, None),
+    'sampling_depth': Int % Range(1, None),
+    'bypass_tips': Bool,
+    'variance_adjusted': Bool,
+    'alpha': Float % Range(0, 1, inclusive_end=True),
+    'random_seed': Int
 }
 
 _beta_collection_parameter_descriptions = {
     'metric': 'The beta diversity metric to be computed.',
     'pseudocount': ('A pseudocount to handle zeros for compositional '
-                    'metrics.  This is ignored for other metrics.'),
+                    'metrics. This is ignored for other metrics.'),
     'replacement': _replacement_description,
     'n': _n_description,
     'sampling_depth': _sampling_depth_description,
@@ -302,7 +301,6 @@ _beta_collection_parameter_descriptions = {
     'alpha': ('The alpha value used with the generalized UniFrac metric.'),
     'random_seed': _random_seed_description
 }
-
 
 plugin.pipelines.register_function(
     function=q2_boots.beta_collection,
@@ -332,7 +330,7 @@ plugin.pipelines.register_function(
 
 _beta_parameters = _beta_collection_parameters | _beta_average_parameters
 _beta_parameter_descriptions = (_beta_collection_parameter_descriptions |
-                                _beta_average_parameter_descriptions)
+                              _beta_average_parameter_descriptions)
 
 plugin.pipelines.register_function(
     function=q2_boots.beta,
@@ -368,7 +366,9 @@ plugin.pipelines.register_function(
         'replacement': Bool,
         'pc_dimensions': Int,
         'color_by': Str,
-        'random_seed': Int
+        'random_seed': Int,
+        'alpha_metrics': List[Str],
+        'beta_metrics': List[Str],
     },
     outputs=[
         ('resampled_tables', Collection[FeatureTable[Frequency]]),
@@ -388,7 +388,15 @@ plugin.pipelines.register_function(
         'replacement': _replacement_description,
         'pc_dimensions': _pc_dimensions_description,
         'color_by': _color_by_description,
-        'random_seed': _random_seed_description
+        'random_seed': _random_seed_description,
+        'alpha_metrics': ('The alpha diversity metrics to compute. If not '
+                          'provided, defaults to observed_features, shannon, '
+                          'pielou_e, and faith_pd (if phylogeny is '
+                          'provided).'),
+        'beta_metrics': ('The beta diversity metrics to compute. If not '
+                         'provided, defaults to braycurtis, jaccard, and '
+                         'unweighted_unifrac and weighted_unifrac (if '
+                         'phylogeny is provided).'),
     },
     output_descriptions={
         'resampled_tables': _resampled_tables_description,
@@ -427,29 +435,29 @@ plugin.pipelines.register_function(
                                   RelativeFrequency |
                                   PresenceAbsence],
             'sequences': FeatureData[Sequence |
-                                     RNASequence |
-                                     ProteinSequence]},
+                                      RNASequence |
+                                      ProteinSequence]},
     parameters={
         'metadata': Metadata,
         'n': Int % Range(1, None),
         'sampling_depth': Int % Range(1, None),
         'alpha_metrics':
-            List[Str % Choices(alpha_metrics['NONPHYLO']['IMPL'] |
-                               alpha_metrics['NONPHYLO']['UNIMPL'])],
+        List[Str % Choices(alpha_metrics['NONPHYLO']['IMPL'] |
+                           alpha_metrics['NONPHYLO']['UNIMPL'])],
         'beta_metrics': List[Str % Choices(
-                                beta_metrics['NONPHYLO']['IMPL'] |
-                                beta_metrics['NONPHYLO']['UNIMPL'])],
+            beta_metrics['NONPHYLO']['IMPL'] |
+            beta_metrics['NONPHYLO']['UNIMPL'])],
         'alpha_average_method': Str % Choices('mean', 'median'),
         'beta_average_method': Str % Choices('non-metric-mean',
-                                             'non-metric-median',
-                                             'medoid'),
+                                              'non-metric-median',
+                                              'medoid'),
         'replacement': Bool,
         'kmer_size': Int,
         'tfidf': Bool,
         'max_df': Float % Range(0, 1, inclusive_start=True,
-                                inclusive_end=True) | Int,
+                                 inclusive_end=True) | Int,
         'min_df': Float % Range(0, 1, inclusive_start=True,
-                                inclusive_end=False) | Int,
+                                 inclusive_end=False) | Int,
         'max_features': Int,
         'norm': Str % Choices(['None', 'l1', 'l2']),
         'pc_dimensions': Int,
@@ -465,7 +473,7 @@ plugin.pipelines.register_function(
         ('scatter_plot', Visualization),
     ],
     input_descriptions={'table': _feature_table_description,
-                        'sequences': "Input sequences for kmerization."},
+                      'sequences': "Input sequences for kmerization."},
     parameter_descriptions={
         'metadata': 'The sample metadata used in generating Emperor plots.',
         'n': _n_description,
@@ -517,6 +525,6 @@ plugin.pipelines.register_function(
                  'the PCoA axes for all beta diversity metrics.'),
     examples={
         'Bootstrapped kmer diversity': _kmer_diversity_bootstrap_example
-        },
+    },
     citations=[citations['Bokulich2024']]
 )

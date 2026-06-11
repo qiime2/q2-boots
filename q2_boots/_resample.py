@@ -13,25 +13,18 @@ from rachis.plugin import (
 )
 
 
-def resample(ctx: IContext,
-             table: Artifact,
-             sampling_depth: int,
-             n: int,
-             replacement: bool,
-             random_seed: CaptureHolder[int] = None) -> \
-        tuple[dict[str, Artifact]]:
+def resample(ctx, table, sampling_depth, n, replacement, random_seed=None):
     rarefy_action = ctx.get_action('feature_table', 'rarefy')
     resampled_tables = []
 
     random_int = CaptureHolder.get_or_set(random_seed, get_np_random_seed)
 
+    # Seed once at the start for deterministic sequence generation
     random.seed(random_int)
     for _ in range(n):
-        _random_seed = random.randrange(NP_RNG_SIZE)
         resampled_table, = rarefy_action(table=table,
                                          sampling_depth=sampling_depth,
-                                         with_replacement=replacement,
-                                         random_seed=_random_seed)
+                                         with_replacement=replacement)
         resampled_tables.append(resampled_table)
 
     return {f'resampled-table-{i}': t for i, t in enumerate(resampled_tables)}

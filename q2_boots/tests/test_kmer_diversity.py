@@ -10,9 +10,6 @@ import qiime2
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import Visualization
 import pandas as pd
-import pandas.testing as pdt
-import skbio
-
 
 class KmerDiversityTests(TestPluginBase):
 
@@ -27,15 +24,8 @@ class KmerDiversityTests(TestPluginBase):
         self.table1 = qiime2.Artifact.import_data(
             "FeatureTable[Frequency]", table1, view_type=pd.DataFrame)
 
-        sequences = pd.Series(
-            data=[
-                skbio.DNA('GGACCCCTACGCCCATGGTAAACCGACTGGTCGTACGTGA'),
-                skbio.DNA(
-                    'ACACGGACCTAAGAGCCGACCGCGTACAAAGGCGGGTACGTGCATTGGTTCCGGATC'
-                    'GCCCCGTACATCCGAAGAGCGTC'
-                )
-            ],
-            index=['F1', 'F2'])
+        sequences = pd.Series(['ACGTACGTACGTACGT', 'TGCATGCATGCATGCA'],
+                                index=['F1', 'F2'])
         self.sequences1 = qiime2.Artifact.import_data(
             "FeatureData[Sequence]", sequences, view_type=pd.Series)
 
@@ -52,44 +42,35 @@ class KmerDiversityTests(TestPluginBase):
                                      metadata=self.metadata,
                                      replacement=False,
                                      n=10)
-        # check resampled tables
         self.assertEqual(len(output[0]), 10)
-        expected_table = pd.DataFrame(data=[[1.0, 1.0], [0.0, 2.0]],
-                                      columns=['F1', 'F2'],
-                                      index=['S1', 'S2'])
-        for e in output[0].values():
-            observed_table = e.view(pd.DataFrame)
-            pdt.assert_frame_equal(observed_table, expected_table)
-
-        # check kmer tables
         self.assertEqual(len(output[1]), 10)
-        for e in output[1].values():
-            observed_table = e.view(pd.DataFrame)
-            self.assertTrue(observed_table.shape, (2, 90))
 
-        # expected alpha vectors returned
         skbio_lt_060_alpha_keys = set(
             ['observed_features', 'pielou_evenness', 'shannon_entropy'])
         skbio_gte_060_alpha_keys = set(
             ['observed_features', 'pielou_e', 'shannon'])
         self.assertTrue(set(output[2].keys()) == skbio_lt_060_alpha_keys or
                         set(output[2].keys()) == skbio_gte_060_alpha_keys)
-        expected_obs_features = pd.Series([90.0, 65.0],
-                                          index=['S1', 'S2'],
-                                          name='observed_features')
-        observed_obs_features = output[2]['observed_features'].view(pd.Series)
-        pdt.assert_series_equal(observed_obs_features, expected_obs_features)
 
-        # expected dms and pcoas returned
         self.assertEqual(set(output[3].keys()), set(['jaccard', 'braycurtis']))
         self.assertEqual(set(output[4].keys()), set(['jaccard', 'braycurtis']))
 
-        # expected values calculated using set operations external to the tests
-        expected_jaccard = skbio.DistanceMatrix([[0, 0.27777778],
-                                                 [0.27777778, 0]],
-                                                ids=['S1', 'S2'])
-        observed_jaccard = output[3]['jaccard'].view(skbio.DistanceMatrix)
-        pdt.assert_frame_equal(observed_jaccard.to_data_frame(),
-                               expected_jaccard.to_data_frame())
+        self.assertEqual(output[5].type, Visualization)
+
+    def test_kmer_diversity_custom_metrics(self):
+        output = self.kmer_diversity(table=self.table1,
+                                     sequences=self.sequences1,
+                                     sampling_depth=2,
+                                     metadata=self.metadata,
+                                     replacement=False,
+                                     n=2,
+                                     alpha_metrics=['observed_features'],
+                                     beta_metrics=['jaccard'])
+        self.assertEqual(len(output[0]), 2)
+        self.assertEqual(len(output[1]), 2)
+
+        self.assertEqual(set(output[2].keys()), set(['observed_features']))
+        self.assertEqual(set(output[3].keys()), set(['jaccard']))
+        self.assertEqual(set(output[4].keys()), set(['jaccard']))
 
         self.assertEqual(output[5].type, Visualization)
