@@ -5,7 +5,7 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-from np.random import RandomState
+from numpy.random import RandomState
 
 from rachis import Artifact
 from rachis.plugin import (
