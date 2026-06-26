@@ -428,7 +428,8 @@ plugin.pipelines.register_function(
                                   PresenceAbsence],
             'sequences': FeatureData[Sequence |
                                      RNASequence |
-                                     ProteinSequence]},
+                                     ProteinSequence |
+                                     LinkedSequence]},
     parameters={
         'metadata': Metadata,
         'n': Int % Range(1, None),
