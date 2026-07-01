@@ -8,9 +8,7 @@
 from numpy.random import default_rng
 
 from rachis import Artifact
-from rachis.plugin import (
-    IContext, CaptureHolder, get_np_random_seed
-)
+from rachis.plugin import IContext, CaptureHolder, get_np_random_seed
 
 
 def resample(ctx: IContext,
