@@ -9,7 +9,7 @@ from numpy.random import default_rng
 
 from rachis import Artifact
 from rachis.plugin import (
-    IContext, CaptureHolder, NP_RNG_SIZE, get_np_random_seed
+    IContext, CaptureHolder, get_np_random_seed
 )
 
 
@@ -25,7 +25,8 @@ def resample(ctx: IContext,
     resampled_tables = []
     random_int = CaptureHolder.get_or_set(random_seed, get_np_random_seed)
     rng = default_rng(random_int)
-    random_seeds = rng.integers(low=0, high=NP_RNG_SIZE, size=n)
+    # The high here is unfortunately capped at 2**64 not 2**128
+    random_seeds = rng.integers(low=0, high=2**64, size=n)
     for _random_seed in random_seeds:
         resampled_table, = rarefy_action(table=table,
                                          sampling_depth=sampling_depth,
