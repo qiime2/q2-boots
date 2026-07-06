@@ -6,6 +6,7 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import yaml
 import pandas as pd
 
 import qiime2
@@ -146,6 +147,32 @@ class ResampleTests(TestPluginBase):
 
         self.assertTrue(_table_list_contains_different_tables(tables1))
         self.assertTrue(_table_list_contains_different_tables(tables3))
+
+    # This test is specifically to reproduce and show the fix for the issue
+    # fixed in https://github.com/qiime2/q2-boots/pull/75.
+    # Reproducing the issue requires the attempted reading of the action.yaml
+    # in an Artifact affected by the bad value for random_seed shown in that PR
+    # This test produces that behavior as directly as possible.
+    def test_rarefy_yaml_regression(self):
+        output = self.resample_pipeline(table=self.table_artifact2,
+                                        sampling_depth=1,
+                                        n=1,
+                                        replacement=True)
+
+        table = list(output.resampled_tables.values())[0]
+        alias_path = table._archiver.provenance_dir / 'action' / 'action.yaml'
+        with open(alias_path, 'r') as alias_fh:
+            alias_yaml = yaml.safe_load(alias_fh)
+            original_uuid = alias_yaml['action']['alias-of']
+
+        original_path = qiime2.Cache().data / original_uuid
+        with open(original_path / 'provenance' / 'action' / 'action.yaml') as \
+                original_fh:
+            # This triggers the error indicated in the PR pre fix
+            _ = yaml.safe_load(original_fh)
+
+        # Just show we got here
+        self.assertTrue(True)
 
     # test helper functions
     def _expected_sampling_depth(self, replacement):
