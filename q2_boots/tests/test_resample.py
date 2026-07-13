@@ -165,12 +165,11 @@ class ResampleTests(TestPluginBase):
             alias_yaml = yaml.safe_load(alias_fh)
             original_uuid = alias_yaml['action']['alias-of']
 
-        # original_path = qiime2.Cache().data / original_uuid
         original_action_yaml = (table._archiver.provenance_dir / 'artifacts' /
                                 original_uuid / 'action' / 'action.yaml')
         with open(original_action_yaml) as original_fh:
             # This triggers the error indicated in the PR pre fix
-            _ = yaml.safe_load(original_fh)
+            yaml.safe_load(original_fh)
 
         # Just show we got here
         self.assertTrue(True)
