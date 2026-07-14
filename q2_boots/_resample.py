@@ -5,11 +5,11 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-from numpy.random import default_rng
+from random import Random
 
 from rachis import Artifact
 from rachis.plugin import (
-    IContext, CaptureHolder, NP_RNG_SIZE, get_np_random_seed
+    IContext, CaptureHolder, get_np_random_seed, NP_RNG_BITS
 )
 
 
@@ -24,8 +24,8 @@ def resample(ctx: IContext,
 
     resampled_tables = []
     random_int = CaptureHolder.get_or_set(random_seed, get_np_random_seed)
-    rng = default_rng(random_int)
-    random_seeds = rng.integers(low=0, high=NP_RNG_SIZE, size=n)
+    rng = Random(random_int)
+    random_seeds = [rng.getrandbits(NP_RNG_BITS) for _ in range(n)]
     for _random_seed in random_seeds:
         resampled_table, = rarefy_action(table=table,
                                          sampling_depth=sampling_depth,
