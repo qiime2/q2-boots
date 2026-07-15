@@ -65,7 +65,9 @@ class KmerDiversityTests(TestPluginBase):
         self.assertEqual(len(output[1]), 10)
         for e in output[1].values():
             observed_table = e.view(pd.DataFrame)
-            self.assertTrue(observed_table.shape, (2, 90))
+            # modified 15 July 2026 from (2, 90) to accommodate changes in:
+            # https://github.com/bokulich-lab/q2-kmerizer/pull/12
+            self.assertEqual(observed_table.shape, (2, 94))
 
         # expected alpha vectors returned
         skbio_lt_060_alpha_keys = set(
@@ -74,7 +76,9 @@ class KmerDiversityTests(TestPluginBase):
             ['observed_features', 'pielou_e', 'shannon'])
         self.assertTrue(set(output[2].keys()) == skbio_lt_060_alpha_keys or
                         set(output[2].keys()) == skbio_gte_060_alpha_keys)
-        expected_obs_features = pd.Series([90.0, 65.0],
+        # modified 15 July 2026 from [90.0, 65.0] to accommodate changes in:
+        # https://github.com/bokulich-lab/q2-kmerizer/pull/12
+        expected_obs_features = pd.Series([94.0, 67.0],
                                           index=['S1', 'S2'],
                                           name='observed_features')
         observed_obs_features = output[2]['observed_features'].view(pd.Series)
@@ -85,8 +89,10 @@ class KmerDiversityTests(TestPluginBase):
         self.assertEqual(set(output[4].keys()), set(['jaccard', 'braycurtis']))
 
         # expected values calculated using set operations external to the tests
-        expected_jaccard = skbio.DistanceMatrix([[0, 0.27777778],
-                                                 [0.27777778, 0]],
+        # modified 15 July 2026 from 0.27777778 to accommodate changes in:
+        # https://github.com/bokulich-lab/q2-kmerizer/pull/12
+        expected_jaccard = skbio.DistanceMatrix([[0, 0.2872340425531915],
+                                                 [0.2872340425531915, 0]],
                                                 ids=['S1', 'S2'])
         observed_jaccard = output[3]['jaccard'].view(skbio.DistanceMatrix)
         pdt.assert_frame_equal(observed_jaccard.to_data_frame(),
