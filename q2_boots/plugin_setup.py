@@ -13,7 +13,7 @@ from q2_types.feature_table import (
     FeatureTable, Frequency, RelativeFrequency, PresenceAbsence
 )
 from q2_types.feature_data import (
-    FeatureData, Sequence, RNASequence, ProteinSequence
+    FeatureData, Sequence, RNASequence, ProteinSequence, LinkedSequence
 )
 from q2_types.sample_data import AlphaDiversity, SampleData
 
@@ -428,7 +428,8 @@ plugin.pipelines.register_function(
                                   PresenceAbsence],
             'sequences': FeatureData[Sequence |
                                      RNASequence |
-                                     ProteinSequence]},
+                                     ProteinSequence |
+                                     LinkedSequence]},
     parameters={
         'metadata': Metadata,
         'n': Int % Range(1, None),
