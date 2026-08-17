@@ -6,11 +6,14 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import shutil
 from skbio import OrdinationResults
 import numpy as np
 
 from rachis import Artifact, Visualization, Metadata
 from rachis.plugin import IContext, CaptureHolder, get_np_random_seed
+
+from q2_types.feature_table import BIOMV210MultiDirFmt
 
 from q2_boots._alpha import (_validate_alpha_metric, _get_alpha_metric_action,
                              _alpha_collection_from_tables)
@@ -35,7 +38,7 @@ def core_metrics(ctx: IContext,
             dict[str, Artifact], dict[str, Visualization], Visualization
         ]:
     random_int = CaptureHolder.get_or_set(random_seed, get_np_random_seed)
-    resample_action = ctx.get_action('boots', 'resample')
+    resample_action = ctx.get_action('boots', 'resample', record_prov=False)
     alpha_average_action = ctx.get_action('boots', 'alpha_average')
     beta_average_action = ctx.get_action('boots', 'beta_average')
     pcoa_action = ctx.get_action('diversity', 'pcoa')
@@ -104,6 +107,23 @@ def core_metrics(ctx: IContext,
         metadata = Metadata(pc_result).merge(metadata)
 
     scatter_plot, = scatter_action(metadata=metadata, color_by=color_by)
+    resampled_table = _combine_tables(resampled_tables)
+    resampled_table = ctx.make_artifact(
+        'FeatureTable[Resampled]',
+        resampled_table
+    )
 
-    return (resampled_tables, alpha_vectors, beta_dms, pcoas, emperor_plots,
+    return (resampled_table, alpha_vectors, beta_dms, pcoas, emperor_plots,
             scatter_plot)
+
+
+def _combine_tables(resampled_tables):
+    ret = BIOMV210MultiDirFmt()
+
+    for key, table in resampled_tables.items():
+        shutil.copyfile(
+            table._archiver.path / 'data' / 'feature-table.biom',
+            ret.path / f'{key}.biom'
+        )
+
+    return ret
