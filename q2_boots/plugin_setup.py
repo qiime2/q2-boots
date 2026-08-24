@@ -371,7 +371,7 @@ plugin.pipelines.register_function(
         'random_seed': Int
     },
     outputs=[
-        ('resampled_tables', FeatureTable[Resampled]),
+        ('resampled_tables', Resampled[FeatureTable[Frequency]]),
         ('alpha_diversities', Collection[SampleData[AlphaDiversity]]),
         ('distance_matrices', Collection[DistanceMatrix]),
         ('pcoas', Collection[PCoAResults]),
