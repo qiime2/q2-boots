@@ -10,7 +10,7 @@ from qiime2.plugin import (Plugin, Int, Range, Collection, Str, Choices, Bool,
                            Float, Metadata, Visualization, Citations, List)
 
 from q2_types.feature_table import (
-    FeatureTable, Frequency, RelativeFrequency, PresenceAbsence
+    FeatureTable, Frequency, RelativeFrequency, PresenceAbsence, Resampled
 )
 from q2_types.feature_data import (
     FeatureData, Sequence, RNASequence, ProteinSequence, LinkedSequence
@@ -371,7 +371,7 @@ plugin.pipelines.register_function(
         'random_seed': Int
     },
     outputs=[
-        ('resampled_tables', Collection[FeatureTable[Frequency]]),
+        ('resampled_tables', Resampled[FeatureTable[Frequency]]),
         ('alpha_diversities', Collection[SampleData[AlphaDiversity]]),
         ('distance_matrices', Collection[DistanceMatrix]),
         ('pcoas', Collection[PCoAResults]),

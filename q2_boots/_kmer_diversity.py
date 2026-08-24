@@ -57,6 +57,10 @@ def kmer_diversity(ctx: IContext,
     for beta_metric in beta_metrics:
         _validate_beta_metric(beta_metric, phylogeny=None)
 
+    # NOTE: If I change resample_action to return
+    # Resampled[FeatureTable[Frequency]] we regain parallelism after kmerizing
+    # ...unless that does the same thing and returns a single doodad... which
+    # it probably will
     resampled_tables, = resample_action(table=table,
                                         sampling_depth=sampling_depth,
                                         n=n,
